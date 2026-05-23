@@ -1,0 +1,222 @@
+{% extends "dash.html" %}
+
+{% block content %}
+<head>
+  <style>
+  /* PDF-specific styling */
+  .tree-report-pdf {
+      font-family: "Times New Roman", serif !important;
+      font-size: 12pt; /* can adjust 12-14 */
+      line-height: 1.5 !important;
+      width: 100%;
+      box-sizing: border-box;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+  }
+
+  /* Avoid splitting headers and content across pages */
+  .pdf-page-break-avoid {
+      page-break-inside: avoid;
+      break-inside: avoid;
+  }
+  
+  /* Hide elements in PDF that shouldn't be exported - only applied to PDF content */
+  .tree-report-pdf .tree-report-buttons,
+  .tree-report-pdf .tree-report-cache-info {
+      display: none;
+  }
+  
+  /* Ensure map container has proper dimensions in PDF */
+  #tree-map-pdf {
+      height: 300px;
+      width: 100%;
+      margin: 1rem 0;
+  }
+  </style>
+</head>
+
+<div class="tree-report-page-wrapper">
+
+  <!-- Buttons -->
+  <div class="tree-report-buttons">
+    <button onclick="window.history.back();" class="tree-report-back-btn">← Back</button>
+    <button class="tree-report-export-btn">Export to PDF</button>
+  </div>
+
+  <!-- Cache Info -->
+  <p class="tree-report-cache-info text-muted">
+    {% if from_cache %}📦 Loaded from saved report{% else %}♻️ Regenerated report{% endif %}
+  </p>
+
+  <!-- Full Report Content - NOW INCLUDES MAP AND CHART -->
+  <div class="tree-report-content">
+    {{ cached_html|safe }}
+    
+    <!-- Leaflet Map (after planting events) -->
+    {% if map_lat and map_lng %}
+    <div id="tree-map" style="height:400px;width:100%;margin:1rem 0;"></div>
+    {% endif %}
+
+    <!-- Survival Trend Chart (after monitoring summary) -->
+    {% if survival_trend_dates and survival_trend_alive and survival_trend_dead %}
+    <div>
+      <h2>Survival Trend</h2>
+      <canvas id="survivalChart" height="200"></canvas>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- JS Libraries -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    // --- Leaflet Map ---
+    const mapEl = document.getElementById("tree-map");
+    if (mapEl) {
+        const lat = parseFloat("{{ map_lat }}");
+        const lng = parseFloat("{{ map_lng }}");
+        if (!isNaN(lat) && !isNaN(lng)) {
+            window.treeReportMap = L.map("tree-map").setView([lat,lng],14);
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: "&copy; OpenStreetMap contributors"
+            }).addTo(window.treeReportMap);
+            L.marker([lat,lng]).addTo(window.treeReportMap)
+                .bindPopup("{{ tree.name }}")
+                .openPopup();
+        }
+    }
+
+    // --- Survival Trend Chart ---
+    let survivalChart = null;
+    {% if survival_trend_dates and survival_trend_alive and survival_trend_dead %}
+    const ctx = document.getElementById("survivalChart").getContext("2d");
+    survivalChart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: {{ survival_trend_dates|safe }},
+            datasets: [
+                { label:"Alive", data: {{ survival_trend_alive|safe }}, borderColor:"green", fill:false },
+                { label:"Dead", data: {{ survival_trend_dead|safe }}, borderColor:"red", fill:false }
+            ]
+        },
+        options: {
+            responsive:true,
+            plugins:{legend:{position:"top"}},
+            scales:{
+                x:{display:true, title:{display:true,text:"Date"}},
+                y:{display:true, title:{display:true,text:"Count"}, beginAtZero:true}
+            }
+        }
+    });
+    {% endif %}
+
+    // --- PDF Export ---
+    const exportBtn = document.querySelector(".tree-report-export-btn");
+    exportBtn.addEventListener("click", async () => {
+        // Ensure map is properly sized before capture
+        if (window.treeReportMap) {
+            window.treeReportMap.invalidateSize();
+        }
+
+        // Create a temporary container for PDF generation
+        const tempContainer = document.createElement("div");
+        tempContainer.style.width = "190mm";
+        tempContainer.style.padding = "15mm 10mm 15mm 10mm";
+        
+        // Clone the main content and buttons section
+        const pageWrapper = document.querySelector(".tree-report-page-wrapper");
+        const pdfContent = pageWrapper.cloneNode(true);
+        pdfContent.classList.add("tree-report-pdf");
+
+        // Process chart for PDF
+        {% if survival_trend_dates and survival_trend_alive and survival_trend_dead %}
+        if (survivalChart) {
+            // Create image from chart
+            const chartImage = new Image();
+            chartImage.src = survivalChart.toBase64Image();
+            chartImage.style.width = "100%";
+            chartImage.style.height = "auto";
+            chartImage.style.maxWidth = "100%";
+            
+            // Replace canvas with image in cloned content
+            const clonedCanvas = pdfContent.querySelector("#survivalChart");
+            if (clonedCanvas) {
+                const chartContainer = clonedCanvas.parentNode;
+                chartContainer.replaceChild(chartImage, clonedCanvas);
+            }
+        }
+        {% endif %}
+
+        // Process map for PDF
+        {% if map_lat and map_lng %}
+        if (window.treeReportMap) {
+            // Wait for map to be ready and capture it
+            window.treeReportMap.whenReady(function() {
+                setTimeout(() => {
+                    html2canvas(window.treeReportMap.getContainer(), {
+                        useCORS: true,
+                        allowTaint: false,
+                        backgroundColor: '#ffffff'
+                    }).then(function(canvas) {
+                        const mapImage = new Image();
+                        mapImage.src = canvas.toDataURL("image/png");
+                        mapImage.style.width = "100%";
+                        mapImage.style.height = "auto";
+                        mapImage.style.maxWidth = "100%";
+                        
+                        // Replace the map container with the image in cloned content
+                        const clonedMapContainer = pdfContent.querySelector("#tree-map");
+                        if (clonedMapContainer) {
+                            clonedMapContainer.innerHTML = '';
+                            clonedMapContainer.appendChild(mapImage);
+                        }
+                    });
+                }, 1000);
+            });
+        }
+        {% endif %}
+
+        // Apply page break avoidance to all elements
+        pdfContent.querySelectorAll("h2, h3, p, div, table").forEach(el => {
+            el.classList.add("pdf-page-break-avoid");
+        });
+
+        // Add to temporary container
+        tempContainer.appendChild(pdfContent);
+        document.body.appendChild(tempContainer);
+
+        // Wait a bit for any dynamic content to render, then generate PDF
+        setTimeout(() => {
+            html2pdf()
+                .set({
+                    margin: [0, 0],
+                    filename: "tree-monitoring-report.pdf",
+                    image: { type: "jpeg", quality: 0.98 },
+                    html2canvas: { 
+                        scale: 2, 
+                        useCORS: true, 
+                        allowTaint: false, 
+                        logging: false,
+                        backgroundColor: '#ffffff'
+                    },
+                    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+                })
+                .from(tempContainer)
+                .save()
+                .finally(() => {
+                    // Clean up temporary container
+                    document.body.removeChild(tempContainer);
+                });
+        }, 2000); // Increased timeout to ensure map capture completes
+    });
+
+});
+</script>
+{% endblock %}

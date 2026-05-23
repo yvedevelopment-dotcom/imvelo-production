@@ -1,0 +1,313 @@
+<div class="tree-report-body-unique-container">
+
+  <h2>🌿 Tree Monitoring Report: {{ tree.name }}</h2>
+
+  <!-- 1. Identity & Planting Context -->
+  <h3>🟩 Tree Identity</h3>
+  <p><strong>Name:</strong> {{ tree.name }}</p>
+  <p><strong>Species:</strong> {{ tree.species }}</p>
+  <p><strong>Scientific Name:</strong> {{ tree.scientific_name }}</p>
+
+  {% if first_planting %}
+    <p><strong>First Planted By:</strong> {{ first_planting.event.organizer }}</p>
+    <p><strong>First Planting Event:</strong> {{ first_planting.event.name }} ({{ first_planting.event.date_planted }})</p>
+  {% endif %}
+
+  <h4>📅 All Planting Events:</h4>
+  <ul class="tree-report-planting-events-list">
+    {% for event in planting_events %}
+      <li>{{ event.name }} - {{ event.date_planted }} by {{ event.organizer }}</li>
+    {% endfor %}
+  </ul>
+
+  <h4>📌 Plots Planted On:</h4>
+  <ul class="tree-report-plots-list">
+    {% for plot in planted_plots %}
+      <li>{{ plot.name }} ({{ plot.latitude }}, {{ plot.longitude }})</li>
+    {% endfor %}
+  </ul>
+
+  <!-- 🗺️ Leaflet Map -->
+  <h3>🗺️ Map of Planted Plots</h3>
+  <div id="treeReportPlotMap" class="tree-report-map"></div>
+
+  <!-- 2. Monitoring Summary -->
+  <h3>🟩 Monitoring Summary</h3>
+  <p><strong>Records:</strong> {{ total_monitorings }}</p>
+  {% if first_monitoring %}
+    <p><strong>First Monitoring:</strong> {{ first_monitoring.monitored_at }}</p>
+  {% endif %}
+  {% if latest_monitoring %}
+    <p><strong>Latest Monitoring:</strong> {{ latest_monitoring.monitored_at }}</p>
+    <p>
+      <strong>Monitoring Duration:</strong>
+      {{ first_monitoring.monitored_at|date:"Y-m-d" }} -
+      {{ latest_monitoring.monitored_at|date:"Y-m-d" }}
+    </p>
+    <p><strong>Avg. Frequency:</strong> ~{{ frequency_days }} days</p>
+  {% endif %}
+
+  <!-- 3. Current Tree Status -->
+  <h3>🟩 Current Status</h3>
+  {% if total_monitorings > 0 %}
+    <p><strong>Total Alive:</strong> {{ total_alive }}</p>
+    <p><strong>Total Dead:</strong> {{ total_dead }}</p>
+    <p><strong>Latest Health:</strong> {{ latest_monitoring.health_status }}</p>
+    <p><strong>Threats:</strong> {{ latest_monitoring.threats_observed }}</p>
+    <p><strong>Conservation:</strong> {{ latest_monitoring.conservation_actions }}</p>
+    <p><strong>Notes:</strong> {{ latest_monitoring.notes }}</p>
+    <p><strong>Monitored By:</strong> {{ latest_monitoring.monitored_by }}</p>
+  {% else %}
+    <p>No monitoring records available.</p>
+  {% endif %}
+
+  <!-- 📈 Survival Statistics -->
+  <h3>📈 Survival Trend</h3>
+  <canvas id="treeReportSurvivalChart"></canvas>
+
+  <!-- Health & Actions Summary -->
+  <h3>📊 Health & Interventions Summary</h3>
+  <ul class="tree-report-health-summary-list">
+    {% for status, count in health_status_counts.items %}
+      <li><strong>{{ status }}:</strong> {{ count }}</li>
+    {% endfor %}
+  </ul>
+
+  <p><strong>Threats Observed:</strong> {{ threats_count }}</p>
+  <p><strong>Conservation Actions Taken:</strong> {{ conservation_actions_count }}</p>
+
+  <h3>🖼️ Latest Monitoring Images by Plot</h3>
+  <div class="tree-report-latest-images-row">
+    {% for item in latest_plot_images %}
+      <div class="tree-report-card shadow-sm">
+        <img
+          src="{{ item.photo.image.url }}"
+          class="tree-report-card-img"
+          alt="Monitoring photo"
+        />
+        <div class="tree-report-card-body">
+          <h5 class="tree-report-card-title">{{ item.plot.name }}</h5>
+          <p class="tree-report-card-text">
+            <strong>Date:</strong> {{ item.monitored_at|date:"Y-m-d" }}<br />
+            {{ item.photo.caption }}
+          </p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- 🤖 AI Section -->
+  <div class="tree-report-ai-container">
+    <h2>🌿 AI Insights for Tree: <strong>{{ tree.name }}</strong></h2>
+    <p><strong>Region:</strong> {{ ai_region_info }}</p>
+
+    <div class="tree-report-ai-lines">
+      {% for line in ai_cleaned_lines %}
+        <p>{{ line }}</p>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+<style>
+  /* Scoped styles for tree report body */
+  .tree-report-body-unique-container {
+    font-family: "Segoe UI", sans-serif;
+    font-size: 16px;
+    color: #333;
+    padding: 20px;
+    line-height: 1.5;
+    background: white;
+    border-radius: 8px;
+  }
+
+  .tree-report-body-unique-container h2,
+  .tree-report-body-unique-container h3,
+  .tree-report-body-unique-container h4 {
+    font-size: 16px;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    color: #2d3748;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 4px;
+  }
+
+  .tree-report-body-unique-container p,
+  .tree-report-body-unique-container li {
+    margin-bottom: 6px;
+  }
+
+  .tree-report-planting-events-list,
+  .tree-report-plots-list,
+  .tree-report-health-summary-list {
+    padding-left: 20px;
+  }
+
+  .tree-report-map {
+    height: 350px;
+    margin: 15px 0 30px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+
+  .tree-report-latest-images-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .tree-report-card {
+    width: 100%;
+    max-width: 350px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .tree-report-card-img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .tree-report-card-body {
+    padding: 10px;
+  }
+
+  .tree-report-card-title {
+    margin-bottom: 0.5rem;
+  }
+
+  .tree-report-card-text {
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  .tree-report-ai-container {
+    font-family: "Segoe UI", sans-serif;
+    font-size: 14px;
+    padding: 1rem 0;
+  }
+
+  .tree-report-ai-lines p {
+    margin-bottom: 0.5em;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Leaflet map initialization
+    if (typeof L !== "undefined") {
+      const streetLayer = L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+          attribution: "© OpenStreetMap contributors",
+        }
+      );
+
+      const satelliteLayer = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/" +
+          "World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+          attribution:
+            "Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye",
+          maxZoom: 18,
+        }
+      );
+
+      const treeReportMap = L.map("treeReportPlotMap", {
+        center: [0, 0],
+        zoom: 2,
+        layers: [satelliteLayer],
+      });
+
+      L.control
+        .layers(
+          {
+            Street: streetLayer,
+            Satellite: satelliteLayer,
+          },
+          null,
+          { collapsed: false }
+        )
+        .addTo(treeReportMap);
+
+      const treeReportBounds = [];
+
+      {% for plot in planted_plots %}
+      const lat{{ forloop.counter }} = {{ plot.latitude }};
+      const lng{{ forloop.counter }} = {{ plot.longitude }};
+      L.marker([lat{{ forloop.counter }}, lng{{ forloop.counter }}])
+        .addTo(treeReportMap)
+        .bindPopup(
+          "<strong>{{ plot.name }}</strong><br>Lat: {{ plot.latitude }}<br>Lng: {{ plot.longitude }}"
+        );
+      treeReportBounds.push([lat{{ forloop.counter }}, lng{{ forloop.counter }}]);
+      {% endfor %}
+
+      if (treeReportBounds.length > 0) {
+        treeReportMap.fitBounds(treeReportBounds, { padding: [20, 20] });
+      } else {
+        treeReportMap.setView([-26.5, 31.5], 7);
+      }
+    }
+
+    // Chart.js survival trend
+    if (typeof Chart !== "undefined") {
+      const survivalData = {
+        labels: [
+          {% for entry in survival_trend %}"{{ entry.date }}"{% if not forloop.last %}, {% endif %}{% endfor %}
+        ],
+        datasets: [
+          {
+            label: "Alive",
+            data: [
+              {% for entry in survival_trend %}{{ entry.alive }}{% if not forloop.last %}, {% endif %}{% endfor %}
+            ],
+            borderColor: "green",
+            backgroundColor: "rgba(0,128,0,0.1)",
+            fill: true,
+            tension: 0.3,
+          },
+          {
+            label: "Dead",
+            data: [
+              {% for entry in survival_trend %}{{ entry.dead }}{% if not forloop.last %}, {% endif %}{% endfor %}
+            ],
+            borderColor: "red",
+            backgroundColor: "rgba(255,0,0,0.1)",
+            fill: true,
+            tension: 0.3,
+          },
+        ],
+      };
+
+      const config = {
+        type: "line",
+        data: survivalData,
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: "Survival Trend Over Time",
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: "Tree Count" },
+            },
+            x: {
+              title: { display: true, text: "Date" },
+            },
+          },
+        },
+      };
+
+      new Chart(document.getElementById("treeReportSurvivalChart"), config);
+    }
+  });
+</script>

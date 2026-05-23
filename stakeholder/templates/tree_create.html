@@ -1,0 +1,249 @@
+{% extends "dash.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<div class="treeform-page-wrapper">
+  <h2 class="treeform-heading">🌳 Add New Tree</h2>
+  <div class="treeform-container">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div class="treeform-form-group">
+          <label class="treeform-label" for="{{ field.id_for_label }}">
+            {{ field.label }}
+            {% if field.name == 'species' %}
+              <a href="{% url 'species_create' %}" target="_blank" class="treeform-link">➕ New</a>
+            {% elif field.name == 'plot' %}
+              <a href="{% url 'plot_create' %}" target="_blank" class="treeform-link">➕ New</a>
+            {% elif field.name == 'categories' %}
+              <a href="{% url 'category_create' %}" target="_blank" class="treeform-link">➕ New</a>
+            {% elif field.name == 'heritage_sites' %}
+              <a href="{% url 'heritage_site_create' %}" target="_blank" class="treeform-link">➕ New</a>
+            {% elif field.name == 'conservation_status' %}
+              <a href="{% url 'conservation_status_create' %}" target="_blank" class="treeform-link">➕ New</a>
+            {% endif %}
+          </label>
+          {{ field|add_class:"form-control treeform-input" }}
+          {% if field.help_text %}
+            <small class="form-text text-muted">{{ field.help_text }}</small>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <h4 class="treeform-section-title">🌿 Tree Images</h4>
+      {{ tree_images.management_form }}
+      {% for form in tree_images %}
+        <div class="form-row">
+          <div class="col">
+            {{ form.image.label_tag }} {{ form.image }}
+          </div>
+          <div class="col">
+            {{ form.caption.label_tag }} {{ form.caption }}
+          </div>
+          {% if form.instance.pk %}
+          <div class="col-auto">
+            {{ form.DELETE }} <label>Delete</label>
+          </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <h4 class="treeform-section-title">🩺 Medical Benefit Images</h4>
+      {{ medical_images.management_form }}
+      {% for form in medical_images %}
+        <div class="form-row">
+          <div class="col">
+            {{ form.image.label_tag }} {{ form.image }}
+          </div>
+          <div class="col">
+            {{ form.caption.label_tag }} {{ form.caption }}
+          </div>
+          {% if form.instance.pk %}
+          <div class="col-auto">
+            {{ form.DELETE }} <label>Delete</label>
+          </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <h4 class="treeform-section-title">🎭 Cultural Significance Images</h4>
+      {{ cultural_images.management_form }}
+      {% for form in cultural_images %}
+        <div class="form-row">
+          <div class="col">
+            {{ form.image.label_tag }} {{ form.image }}
+          </div>
+          <div class="col">
+            {{ form.caption.label_tag }} {{ form.caption }}
+          </div>
+          {% if form.instance.pk %}
+          <div class="col-auto">
+            {{ form.DELETE }} <label>Delete</label>
+          </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <h4 class="treeform-section-title">⚠️ Threats & Conservation Images</h4>
+      {{ threats_images.management_form }}
+      {% for form in threats_images %}
+        <div class="form-row">
+          <div class="col">
+            {{ form.image.label_tag }} {{ form.image }}
+          </div>
+          <div class="col">
+            {{ form.caption.label_tag }} {{ form.caption }}
+          </div>
+          {% if form.instance.pk %}
+          <div class="col-auto">
+            {{ form.DELETE }} <label>Delete</label>
+          </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <div class="mt-4">
+        <button type="submit" class="treeform-submit">💾 Save Tree</button>
+        <a href="{% url 'tree_list-m' %}" class="treeform-cancel">↩️ Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+/* Wrapper to prevent sidebar shrink */
+.treeform-page-wrapper {
+    width: 100%;
+    min-width: 0; /* critical inside dash flex */
+}
+
+/* Headings */
+.treeform-heading {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1b3a1b;
+    border-left: 6px solid #295129;
+    padding-left: 12px;
+    margin-bottom: 30px;
+}
+
+/* Form container */
+.treeform-container {
+    background-color: #798071;
+    padding: 30px;
+    border: 1px solid #295129;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(34, 58, 34, 0.1);
+    width: 100%;
+    min-width: 0;
+}
+
+/* Form groups and labels */
+.treeform-form-group { margin-bottom: 1.8rem; }
+.treeform-label {
+    font-weight: 600;
+    color: #2e4b2e;
+    display: block;
+    margin-bottom: 6px;
+}
+
+/* Inputs */
+.treeform-input,
+.treeform-select,
+.form-control {
+    width: 100%;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid #295129;
+    border-radius: 6px;
+    background-color: #c3d4c3;
+    color: #1b3a1b;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+}
+
+/* Links */
+.treeform-link {
+    margin-left: 10px;
+    font-size: 0.8rem;
+    color: #ffffff;
+    background-color: #3d5c3d;
+    border: 1px solid #294429;
+    padding: 3px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+}
+.treeform-link:hover { background-color: #4e6f4e; }
+
+/* Section titles */
+.treeform-section-title {
+    margin-top: 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1b3a1b;
+    border-bottom: 1px dashed #2e4b2e;
+    padding-bottom: 4px;
+}
+
+/* Buttons */
+.treeform-submit {
+    background-color: #295129;
+    color: #ffffff;
+    padding: 10px 20px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+.treeform-submit:hover { background-color: #3d5c3d; }
+
+.treeform-cancel {
+    margin-left: 12px;
+    background-color: #cccccc;
+    color: #000;
+    padding: 10px 16px;
+    border-radius: 6px;
+    border: none;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+.treeform-cancel:hover { background-color: #b4b4b4; }
+
+/* Flex rows for images */
+.form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+.form-row .col { flex: 1; min-width: 0; }
+.form-row .col-auto { display: flex; align-items: center; }
+</style>
+
+<!-- Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('select').select2({
+        width: '100%',
+        theme: 'bootstrap-5',
+        placeholder: 'Select an option'
+    });
+    $('.select2-plot').select2({
+        width: '100%',
+        theme: 'bootstrap-5',
+        placeholder: 'Search or select a plot'
+    });
+});
+</script>
+{% endblock %}

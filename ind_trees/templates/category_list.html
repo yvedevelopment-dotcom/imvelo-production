@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category List</title>
+    <style>
+        /* General Body Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* Main Container */
+        .category-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* Heading Styles */
+        .category-heading {
+            text-align: center;
+            font-size: 2em;
+            color: #2b7a77;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        /* Category List */
+        .category-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .category-item {
+            background-color: #fff;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .category-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .category-item a {
+            text-decoration: none;
+            color: #2b7a77;
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+
+        .category-item a:hover {
+            color: #4CAF50;
+        }
+
+        .category-item p {
+            font-size: 1.1em;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .category-heading {
+                font-size: 1.5em;
+            }
+
+            .category-item {
+                padding: 12px;
+            }
+
+            .category-item a {
+                font-size: 1.2em;
+            }
+
+            .category-item p {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="category-container">
+        <h1 class="category-heading">All Categories</h1>
+
+        <ul class="category-list">
+            {% for category in categories %}
+                <li class="category-item">
+                    <a href="{% url 'trees-by-category' category.id %}">{{ category.name }}</a>
+                    <p>{{ category.description }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</body>
+</html>
+{% endblock %}

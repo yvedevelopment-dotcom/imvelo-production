@@ -1,0 +1,136 @@
+{% extends "dash.html" %}
+{% block content %}
+
+<style>
+  body {
+    background-color: #f3f6f4;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .tree-event-container {
+    max-width: 960px;
+    margin: 2rem auto;
+    padding: 2.5rem 3rem;
+    background-color: #576e56;
+    border-radius: 10px;
+    border-left: 6px solid #1c3f2e; /* Dark green border */
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+  }
+
+  .tree-event-container h1 {
+    font-size: 2rem;
+    color: #1c3f2e;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #1c3f2e;
+    padding-bottom: 0.5rem;
+  }
+
+  .search-form .input-group {
+    box-shadow: 0 4px 12px rgba(28, 63, 46, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .search-form input[type="text"] {
+    border: 1px solid #ced4da;
+    border-right: none;
+    padding: 0.5rem 1rem;
+  }
+
+  .search-form button {
+    background-color: #1c3f2e;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    transition: background-color 0.3s ease;
+  }
+
+  .search-form button:hover {
+    background-color: #2f5741;
+  }
+
+  .btn-add-event {
+    background-color: #1c3f2e;
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+  }
+
+  .btn-add-event:hover {
+    background-color: #2f5741;
+    color: white;
+  }
+
+  .event-list {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .event-list li {
+    background-color: #f9fcf9;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #d0e0d4;
+    border-left: 5px solid #1c3f2e;
+    border-radius: 6px;
+    transition: box-shadow 0.3s ease;
+  }
+
+  .event-list li:hover {
+    box-shadow: 0 6px 16px rgba(28, 63, 46, 0.12);
+  }
+
+  .event-list a {
+    color: #1c3f2e;
+    font-size: 1.15rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .event-list a:hover {
+    text-decoration: underline;
+  }
+
+  .text-muted {
+    font-size: 0.9rem;
+    color: #5a6e61;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 2rem;
+    font-style: italic;
+    color: #777;
+  }
+</style>
+
+<div class="tree-event-container">
+  <h1>🌿 Tree Planting Events</h1>
+
+  <form method="get" action="{% url 'treeplantingevent_list-m' %}" class="mb-4 search-form">
+    <div class="input-group">
+      <input type="text" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="Search by event name or tree name">
+      <button type="submit">🔍 Search</button>
+    </div>
+  </form>
+
+  <a href="{% url 'treeplantingevent_create-m' %}" class="btn-add-event">➕ Add New Event</a>
+
+  <ul class="event-list">
+    {% for event in events %}
+      <li>
+        <a href="{% url 'treeplantingevent_detail-m' event.pk %}">{{ event.name }}</a>
+        <div class="text-muted">{{ event.date_planted }} — {{ event.number_of_trees_planted }} trees</div>
+      </li>
+    {% empty %}
+      <li class="no-results">No tree planting events found.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

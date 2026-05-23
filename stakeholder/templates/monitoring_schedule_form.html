@@ -1,0 +1,134 @@
+{% extends "dash.html" %}
+{% load static %}
+
+{% block content %}
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style>
+  body {
+    font-family: "Segoe UI", Roboto, sans-serif;
+    background-color: #0f1f0f;
+    color: #e0f0e0;
+    font-size: 0.9rem;
+  }
+
+  .form-container {
+    max-width: 650px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: #1b2d1b;
+    border: 2px solid #2e4a2e;
+    border-radius: 10px;
+    box-shadow: 0 0 15px #0a160a;
+  }
+
+  .form-container h1 {
+    font-size: 1.3rem;
+    color: #aaffaa;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #355335;
+    padding-bottom: 0.5rem;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  form p {
+    margin: 0;
+  }
+
+  form label {
+    display: block;
+    color: #d0ffd0;
+    margin-bottom: 0.3rem;
+    font-weight: bold;
+    font-size: 0.85rem;
+  }
+
+  form input, form select, .select2-container--default .select2-selection--single {
+    width: 100% !important;
+    background-color: #0f1f0f;
+    border: 1px solid #355335;
+    color: #aaffaa;
+    padding: 0.4rem;
+    border-radius: 5px;
+    font-size: 0.85rem;
+  }
+
+  .select2-selection__rendered {
+    color: #aaffaa;
+  }
+
+  .select2-selection {
+    background-color: #0f1f0f !important;
+    border: 1px solid #355335 !important;
+  }
+
+  .select2-dropdown {
+    background-color: #1b2d1b;
+    color: #aaffaa;
+    border: 1px solid #355335;
+  }
+
+  form button {
+    background-color: #234d23;
+    color: #aaffaa;
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    width: 120px;
+    align-self: flex-start;
+  }
+
+  form button:hover {
+    background-color: #2f6e2f;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 1.2rem;
+    color: #88cc88;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: #b3ffb3;
+    text-decoration: underline;
+  }
+</style>
+
+<div class="form-container">
+  <h1>Create Monitoring Schedule</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">💾 Save</button>
+  </form>
+  <a class="back-link" href="{% url 'monitoring_schedule_list-m' %}">🔙 Back to list</a>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $('.select2').select2({
+      width: 'resolve',
+      placeholder: "Select a plot...",
+      allowClear: true
+    });
+  });
+</script>
+{% endblock %}

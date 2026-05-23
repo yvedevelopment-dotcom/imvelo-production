@@ -1,0 +1,52 @@
+{% extends "dash.html" %}
+{% block content %}
+<h1>Reports for Tree: {{ tree.name }}</h1>
+
+<!-- Latest snapshot (if any) -->
+{% if cached_report %}
+    <h3>Latest Report (Quick Access)</h3>
+    <p><strong>Last generated:</strong> {{ cached_report.last_generated }}</p>
+    <a href="{% url 'tree_cached_report' tree.pk %}" class="btn btn-primary">View Latest Report</a>
+{% else %}
+    <p>No report has been generated yet.</p>
+{% endif %}
+
+<hr>
+
+<!-- Historical Reports List -->
+<h3>All Generated Reports</h3>
+{% if reports %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Generated At</th>
+                <th>Monitoring As Of</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for report in reports %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ report.created_at|date:"Y-m-d H:i" }}</td>
+                <td>{{ report.last_monitoring_at|date:"Y-m-d" }}</td>
+                <td>
+                    <a href="{% url 'tree_report_detail' report.pk %}" class="btn btn-sm btn-info">
+                        View Report
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No historical reports found.</p>
+{% endif %}
+
+<hr>
+<!-- Button to generate a brand new report -->
+<a href="{% url 'tree_full_report' tree.pk %}" class="btn btn-success">
+    Generate New Report
+</a>
+{% endblock %}

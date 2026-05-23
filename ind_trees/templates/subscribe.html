@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="subscription-pagem">
+    <div class="subscription-boxm">
+        <h1 class="subscription-titlem">Subscribe to our Newsletter</h1>
+        <form method="post" class="subscription-formm">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="subscription-buttonm">Subscribe</button>
+        </form>
+        <p class="subscriptionm-footer">Stay updated with the latest news and updates.</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .subscription-pagem {
+        font-family: Arial, sans-serif;
+        background-color: #e8f0fe;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .subscription-boxm {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+        padding: 40px;
+        text-align: center;
+        width: 100%;
+        max-width: 450px;
+    }
+
+    .subscription-titlem {
+        font-size: 26px;
+        margin-bottom: 25px;
+        color: #222222;
+    }
+
+    .subscription-formm {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .subscription-inputm {
+        width: 100%;
+        padding: 12px;
+        margin: 12px 0;
+        border: 1px solid #bbbbbb;
+        border-radius: 6px;
+        font-size: 15px;
+    }
+
+    .subscription-buttonm {
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .subscription-buttonm:hover {
+        background-color: #174ea6;
+    }
+
+    .subscriptionm-footer {
+        font-size: 13px;
+        color: #444;
+        margin-top: 22px;
+    }
+</style>
+{% endblock %}

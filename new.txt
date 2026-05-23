@@ -1,0 +1,30 @@
+ to do first, plot monitoring
+ then map display
+ 
+ 
+ 
+ 
+ 
+ plot  monitoring
+    -the land itsself,
+    - environmental data
+           ->Ai insights
+    -GEE *erosion, soil degradation, carbon contents, etc
+           ->Ai insights
+    -planting events
+           -Trees
+           
+    -Ai summary
+# evaluate impact eg carbon footfrint, etc
+# Ai live monitoring
+
+team on grd	 *awareness*
+ track, location, tree nanes, benefits, dates,  tre height
+ cost of both storages, gudgets, transport, personnel, QR tags (not once off cost)
+ Vumelani Dlamini
+
+
+**** refrences
+****tre info on programs
+
+NDC, UNFCCC

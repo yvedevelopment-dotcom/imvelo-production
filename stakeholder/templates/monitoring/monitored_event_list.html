@@ -1,0 +1,129 @@
+{% extends "dash.html" %}
+{% block content %}
+<style>
+  body {
+    background-color: #0b2e13;
+    color: #cddac8;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+  }
+
+  .military-container {
+    padding: 20px;
+    background-color: #102815;
+    border: 1px solid #335d3f;
+    border-radius: 6px;
+    box-shadow: 0 0 10px #0f2e17;
+    max-width: 800px;
+    margin: 20px auto;
+  }
+
+  .military-heading {
+    color: #8bc34a;
+    border-bottom: 1px solid #3c5c38;
+    padding-bottom: 4px;
+    margin-bottom: 12px;
+  }
+
+  .military-search-form {
+    margin-bottom: 16px;
+  }
+
+  .military-search-input {
+    background-color: #1c3a22;
+    color: #cddac8;
+    border: 1px solid #446b4b;
+    padding: 4px 8px;
+    font-size: 12px;
+    width: 70%;
+  }
+
+  .military-search-button {
+    background-color: #2e5b3e;
+    color: #e0f2e0;
+    border: none;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .military-search-button:hover {
+    background-color: #3d734f;
+  }
+
+  .military-event-list {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .military-event-item {
+    background-color: #16391f;
+    padding: 6px 10px;
+    margin-bottom: 6px;
+    border-left: 3px solid #4caf50;
+    font-size: 12px;
+    transition: background-color 0.2s ease;
+  }
+
+  .military-event-item:hover {
+    background-color: #1e4727;
+  }
+
+  .military-event-link {
+    color: #a4e79f;
+    text-decoration: none;
+  }
+
+  .military-event-link:hover {
+    color: #ffffff;
+    text-decoration: underline;
+  }
+
+  .military-note {
+    font-size: 12px;
+    margin-top: 10px;
+  }
+
+  .military-back-btn {
+    display: inline-block;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #e0f2e0;
+    text-decoration: none;
+    background-color: #2e5b3e;
+    padding: 4px 8px;
+    border-radius: 3px;
+  }
+
+  .military-back-btn:hover {
+    background-color: #3d734f;
+  }
+</style>
+
+<div class="military-container">
+  <a href="{% url 'monitored_tree_list-d' %}" class="military-back-btn">← Back</a>
+
+  <h2 class="military-heading">🌳 Events with Monitoring Records</h2>
+
+  <form method="get" class="military-search-form">
+    <input type="text" name="q" class="military-search-input" placeholder="Search by event, plot, or tree..." value="{{ search_query }}">
+    <button type="submit" class="military-search-button">Search</button>
+  </form>
+
+  {% if events %}
+    <ul class="military-event-list">
+      {% for event in events %}
+        <li class="military-event-item">
+          <a href="{% url 'event_monitoring_detail-d' event.pk %}" class="military-event-link">
+            {{ event.name }} — {{ event.date_planted }}
+          </a>
+          ({{ event.monitoring_count }} records)
+          {% if event.plot %} — Plot: {{ event.plot.name }}{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="military-note">⚠️ No monitored events found matching your search.</p>
+  {% endif %}
+</div>
+{% endblock %}

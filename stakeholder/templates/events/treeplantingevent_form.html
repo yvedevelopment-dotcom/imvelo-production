@@ -1,0 +1,291 @@
+{% extends "dash.html" %}
+{% load static %}
+
+{% block content %}
+
+{% load widget_tweaks %}
+
+<!-- Select2 & jQuery for enhanced select boxes -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+{% if messages %}
+<div class="alert-container">
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<h1 style="text-align:center; color:#d9e6b9; font-family:monospace;">
+  {% if form.instance.pk %}Edit{% else %}Create{% endif %} Tree Planting Event
+</h1>
+
+<form method="post" enctype="multipart/form-data" style="max-width:900px; margin:0 auto; background:#3a4032; padding:20px; border-radius:6px;">
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <!-- Main Event Fields -->
+  <fieldset>
+    <legend>Main Event Details</legend>
+    <div class="form-grid">
+      {% for field in form %}
+        <div class="form-group {% if field.errors %}has-error{% endif %}">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <small class="form-text text-muted">{{ field.help_text }}</small>
+          {% endif %}
+          {% for error in field.errors %}
+            <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+  </fieldset>
+
+  <hr style="border-color: #556b2f; margin: 25px 0;">
+
+  <!-- Tree Species Formset -->
+  <fieldset>
+    <legend>Trees Planted</legend>
+    {{ trees.management_form }}
+    {% if trees.non_form_errors %}
+      <div class="alert alert-danger">{{ trees.non_form_errors }}</div>
+    {% endif %}
+    
+    <div id="tree-formset-container">
+      {% for tree_form in trees.forms %}
+        <div class="tree-formset-row mb-3 p-3 border rounded">
+          {% for hidden in tree_form.hidden_fields %}
+            {{ hidden }}
+          {% endfor %}
+          
+          <div class="row g-3">
+            <div class="col-md-3 {% if tree_form.tree.errors %}has-error{% endif %}">
+              {{ tree_form.tree.label_tag }} 
+              {{ tree_form.tree|add_class:"select2" }}
+              {% for error in tree_form.tree.errors %}
+                <div class="text-danger">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="col-md-2 {% if tree_form.quantity_planted.errors %}has-error{% endif %}">
+              {{ tree_form.quantity_planted.label_tag }} 
+              {{ tree_form.quantity_planted }}
+              {% for error in tree_form.quantity_planted.errors %}
+                <div class="text-danger">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="col-md-2 {% if tree_form.latitude.errors %}has-error{% endif %}">
+              {{ tree_form.latitude.label_tag }} 
+              {{ tree_form.latitude }}
+              {% for error in tree_form.latitude.errors %}
+                <div class="text-danger">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="col-md-2 {% if tree_form.longitude.errors %}has-error{% endif %}">
+              {{ tree_form.longitude.label_tag }} 
+              {{ tree_form.longitude }}
+              {% for error in tree_form.longitude.errors %}
+                <div class="text-danger">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              {% if tree_form.DELETE %}
+                <div class="form-check">
+                  {{ tree_form.DELETE }} 
+                  <label class="form-check-label" for="{{ tree_form.DELETE.id_for_label }}">Delete</label>
+                </div>
+              {% else %}
+                <button type="button" class="btn btn-danger remove-tree-row">Remove</button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <button type="button" class="btn btn-secondary mt-2" id="add-tree-row">
+      <i class="fas fa-plus"></i> Add Another Tree Species
+    </button>
+  </fieldset>
+
+  <hr style="border-color: #556b2f; margin: 25px 0;">
+
+  <!-- Image Formset -->
+  <fieldset>
+    <legend>Upload Event Images</legend>
+    {{ images.management_form }}
+    {% if images.non_form_errors %}
+      <div class="alert alert-danger">{{ images.non_form_errors }}</div>
+    {% endif %}
+    
+    <div id="image-formset-container">
+      {% for img_form in images.forms %}
+        <div class="image-formset-row mb-3 p-3 border rounded">
+          {% for hidden in img_form.hidden_fields %}
+            {{ hidden }}
+          {% endfor %}
+          
+          <div class="row g-3">
+            <div class="col-md-6 {% if img_form.image.errors %}has-error{% endif %}">
+              <label>Image:</label> 
+              {{ img_form.image }}
+              {% for error in img_form.image.errors %}
+                <div class="text-danger">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="col-md-4 {% if img_form.caption.errors %}has-error{% endif %}">
+              <label>Caption:</label> 
+              {{ img_form.caption }}
+              {% for error in img_form.caption.errors %}
+                <div class="text-danger">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              {% if img_form.DELETE %}
+                <div class="form-check">
+                  {{ img_form.DELETE }} 
+                  <label class="form-check-label" for="{{ img_form.DELETE.id_for_label }}">Delete</label>
+                </div>
+              {% else %}
+                <button type="button" class="btn btn-danger remove-image-row">Remove</button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <button type="button" class="btn btn-secondary mt-2" id="add-image-row">
+      <i class="fas fa-plus"></i> Add Another Image
+    </button>
+  </fieldset>
+
+  <div style="margin-top:24px; display:flex; justify-content:space-between;">
+    <button type="submit" class="btn btn-success">📂 Save</button>
+    <a href="{% url 'treeplantingevent_list-m' %}" class="btn btn-link">Cancel</a>
+  </div>
+</form>
+
+<script>
+$(document).ready(function () {
+    // Initialize Select2 on page load
+    $('.select2').select2({ width: '100%', theme: 'classic' });
+
+    // Tree Formset
+    let treeFormCount = parseInt($('#id_trees-TOTAL_FORMS').val());
+    const maxTreeForms = 1000;
+
+    $('#add-tree-row').click(function() {
+        if (treeFormCount >= maxTreeForms) return;
+
+        const newForm = $('.tree-formset-row:first').clone(false);
+        const newIndex = treeFormCount;
+
+        // Update input names/ids and clear values
+        newForm.find(':input').each(function() {
+            const name = $(this).attr('name').replace(/-\d+-/, `-${newIndex}-`);
+            const id = $(this).attr('id').replace(/-\d+-/, `-${newIndex}-`);
+            $(this).attr({name, id}).val('').prop('checked', false);
+        });
+
+        // Remove error classes
+        newForm.find('.has-error').removeClass('has-error');
+        newForm.find('.text-danger').remove();
+
+        // Replace remove button
+        newForm.find('.col-md-3').last().html('<button type="button" class="btn btn-danger remove-tree-row">Remove</button>');
+
+        // Reinitialize Select2
+        newForm.find('select').select2({ width: '100%', theme: 'classic' });
+
+        // Append
+        $('#tree-formset-container').append(newForm);
+
+        treeFormCount++;
+        $('#id_trees-TOTAL_FORMS').val(treeFormCount);
+    });
+
+    // Remove tree form
+    $(document).on('click', '.remove-tree-row', function() {
+        $(this).closest('.tree-formset-row').remove();
+        treeFormCount--;
+        $('#id_trees-TOTAL_FORMS').val(treeFormCount);
+
+        // Reindex remaining forms
+        $('.tree-formset-row').each(function(index) {
+            $(this).find(':input').each(function() {
+                const name = $(this).attr('name').replace(/-\d+-/, `-${index}-`);
+                const id = $(this).attr('id').replace(/-\d+-/, `-${index}-`);
+                $(this).attr({name, id});
+            });
+        });
+    });
+
+    // Image formset logic remains unchanged
+    let imageFormCount = parseInt($('#id_images-TOTAL_FORMS').val());
+    const maxImageForms = 1000;
+
+    $('#add-image-row').click(function() {
+        if (imageFormCount >= maxImageForms) return;
+
+        const newForm = $('.image-formset-row:first').clone(false);
+        const newIndex = imageFormCount;
+
+        newForm.find(':input').each(function() {
+            const name = $(this).attr('name').replace(/-\d+-/, `-${newIndex}-`);
+            const id = $(this).attr('id').replace(/-\d+-/, `-${newIndex}-`);
+            $(this).attr({name, id}).val('').prop('checked', false);
+        });
+
+        newForm.find('.has-error').removeClass('has-error');
+        newForm.find('.text-danger').remove();
+
+        newForm.find('.col-md-2').last().html('<button type="button" class="btn btn-danger remove-image-row">Remove</button>');
+
+        $('#image-formset-container').append(newForm);
+
+        imageFormCount++;
+        $('#id_images-TOTAL_FORMS').val(imageFormCount);
+    });
+
+    $(document).on('click', '.remove-image-row', function() {
+        $(this).closest('.image-formset-row').remove();
+        imageFormCount--;
+        $('#id_images-TOTAL_FORMS').val(imageFormCount);
+
+        $('.image-formset-row').each(function(index) {
+            $(this).find(':input').each(function() {
+                const name = $(this).attr('name').replace(/-\d+-/, `-${index}-`);
+                const id = $(this).attr('id').replace(/-\d+-/, `-${index}-`);
+                $(this).attr({name, id});
+            });
+        });
+    });
+});
+</script>
+
+<style>
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+  }
+  .has-error input, .has-error select, .has-error textarea {
+    border-color: #dc3545;
+  }
+  .alert-container {
+    max-width: 900px;
+    margin: 0 auto 20px;
+  }
+  .tree-formset-row, .image-formset-row {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .remove-tree-row, .remove-image-row {
+    width: 100%;
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends "dash.html" %}
+{% load static %}
+
+{% block content %}
+<!-- Leaflet CSS + JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+  body {
+    font-family: "Courier New", Courier, monospace;
+  }
+
+  .plot-detail {
+    padding: 1.5rem;
+    background-color: #111e11;
+    border: 2px solid #294229;
+    border-radius: 8px;
+    color: #cde0cd;
+    max-width: 960px;
+    margin: auto;
+    box-shadow: 0 0 8px rgba(50, 150, 50, 0.3);
+  }
+
+  .plot-detail h2 {
+    font-size: 1.4rem;
+    color: #9eff9e;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #294229;
+    padding-bottom: 0.4rem;
+  }
+
+  .plot-info p {
+    margin: 0.3rem 0;
+    font-size: 0.9rem;
+  }
+
+  .plot-map {
+    height: 400px;
+    margin: 1rem 0;
+    border-radius: 6px;
+    border: 2px solid #4caf50;
+  }
+
+  .plot-images {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+
+  .plot-images img {
+    max-width: 220px;
+    border-radius: 4px;
+    border: 1px solid #4caf50;
+  }
+
+  .plot-images p {
+    font-size: 0.75rem;
+    color: #86c786;
+    margin-top: 0.3rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 1.2rem;
+    padding: 0.4rem 0.8rem;
+    background-color: #294229;
+    color: #b4ffb4;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 1px solid #4caf50;
+    font-size: 0.85rem;
+  }
+
+  .back-link:hover {
+    background-color: #3a5f3a;
+  }
+
+  ul {
+    list-style-type: square;
+    padding-left: 1.2rem;
+    font-size: 0.85rem;
+    color: #cde0cd;
+  }
+
+  ul li {
+    margin-bottom: 0.3rem;
+  }
+
+  h3 {
+    margin-top: 1.5rem;
+    font-size: 1rem;
+    color: #aef9ae;
+    border-bottom: 1px dashed #3a5f3a;
+    padding-bottom: 0.3rem;
+  }
+</style>
+
+<div class="plot-detail">
+  <h2>📍 {{ plot.name }}</h2>
+
+  <div class="plot-info">
+    <p><strong>Area (ha):</strong> {{ plot.area_hectares }}</p>
+    <p><strong>Location:</strong> {{ plot.location }}</p>
+    <p><strong>Ownership:</strong> {{ plot.land_ownership }}</p>
+    <p><strong>Protection Status:</strong> {{ plot.protection_status }}</p>
+    <p><strong>Zone Type:</strong> {{ plot.zone_type }}</p>
+    <p><strong>Coordinates:</strong> {{ plot.latitude }}, {{ plot.longitude }}</p>
+  </div>
+
+  {% if plot.latitude and plot.longitude %}
+    <div id="plotMap" class="plot-map"></div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const map = L.map('plotMap').setView([{{ plot.latitude }}, {{ plot.longitude }}], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 18,
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        L.marker([{{ plot.latitude }}, {{ plot.longitude }}])
+          .addTo(map)
+          .bindPopup("{{ plot.name }}")
+          .openPopup();
+
+        {% if plot.boundary_coordinates %}
+          var rawCoords = {{ plot.boundary_coordinates|safe }};
+          var polygonCoords = rawCoords.map(function(coord) {
+            return [coord[0], coord[1]];
+          });
+
+          var polygon = L.polygon(polygonCoords, {
+            color: "#2f6b2f",
+            weight: 3,
+            fillColor: "#a5d6a7",
+            fillOpacity: 0.4
+          }).addTo(map);
+
+          map.fitBounds(polygon.getBounds());
+        {% endif %}
+      });
+    </script>
+  {% endif %}
+
+  {% if plot.images.all %}
+    <h3>🖼️ Land Images</h3>
+    <div class="plot-images">
+      {% for image in plot.images.all %}
+        <div>
+          <img src="{{ image.image.url }}" alt="{{ image.caption }}">
+          {% if image.caption %}<p><em>{{ image.caption }}</em></p>{% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if plot.land_data %}
+    <h3>🌿 Environmental Data</h3>
+    <ul>
+      <li><strong>Soil Type:</strong> {{ plot.land_data.soil_type }}</li>
+      <li><strong>Soil pH:</strong> {{ plot.land_data.soil_pH }}</li>
+      <li><strong>Fertility Level:</strong> {{ plot.land_data.fertility_level }}</li>
+      <li><strong>Rainfall (mm):</strong> {{ plot.land_data.rainfall_mm }}</li>
+      <li><strong>Temperature (°C):</strong> {{ plot.land_data.temperature_c }}</li>
+      <li><strong>Water Source Proximity:</strong> {{ plot.land_data.water_source_proximity }}</li>
+      <li><strong>Biodiversity Notes:</strong> {{ plot.land_data.biodiversity_notes|default:"N/A" }}</li>
+      <li><strong>Recorded On:</strong> {{ plot.land_data.recorded_on }}</li>
+    </ul>
+  {% else %}
+    <p><em>No environmental data available for this land.</em></p>
+      <a href="{% url 'data-create-m' %}?plot_id={{ plot.id }}">+ Add Environmental Data</a>
+
+  {% endif %}
+
+  <a href="{% url 'plot_list-m' %}" class="back-link">🔙 Return to Plot Directory</a>
+</div>
+{% endblock %}

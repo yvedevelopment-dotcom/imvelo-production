@@ -1,0 +1,151 @@
+{% extends "dash.html" %}
+{% block content %}
+<style>
+  body {
+    background-color: #0b2e13;
+    color: #cddac8;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+  }
+
+  .monitoring-container {
+    padding: 20px;
+    background-color: #102815;
+    border: 1px solid #335d3f;
+    border-radius: 6px;
+    box-shadow: 0 0 10px #0f2e17;
+    max-width: 1000px;
+    margin: 20px auto;
+  }
+
+  .monitoring-heading, 
+  .monitoring-subheading, 
+  .monitoring-tree-heading {
+    color: #8bc34a;
+    margin-bottom: 10px;
+  }
+
+  .monitoring-back-btn {
+    display: inline-block;
+    margin-bottom: 15px;
+    padding: 4px 10px;
+    background-color: #2e5b3e;
+    color: #e0f2e0;
+    text-decoration: none;
+    font-size: 12px;
+    border-radius: 3px;
+  }
+
+  .monitoring-back-btn:hover {
+    background-color: #3d734f;
+    color: #ffffff;
+  }
+
+  .monitoring-paragraph,
+  .monitoring-tree-detail {
+    font-size: 12px;
+    margin: 3px 0;
+  }
+
+  .monitoring-strong {
+    color: #d3f9a4;
+  }
+
+  .monitoring-tree-list {
+    padding-left: 20px;
+  }
+
+  .monitoring-tree-item {
+    background-color: #16391f;
+    padding: 4px 8px;
+    margin-bottom: 4px;
+    border-left: 2px solid #4caf50;
+  }
+
+  .monitoring-divider {
+    border-color: #3d5d45;
+    margin: 20px 0;
+  }
+
+  .monitoring-photo-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .monitoring-photo-card {
+    background-color: #1a3923;
+    padding: 6px;
+    border: 1px solid #2e5b3e;
+    border-radius: 4px;
+    width: 160px;
+    text-align: center;
+  }
+
+  .monitoring-photo-card img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #446b4b;
+  }
+
+  .monitoring-photo-caption {
+    font-size: 11px;
+    margin-top: 4px;
+    color: #cddac8;
+  }
+</style>
+
+<div class="monitoring-container">
+  <a href="{% url 'monitored_event_list-d' %}" class="monitoring-back-btn">← Back to Events</a>
+
+  <h2 class="monitoring-heading">📋 Monitoring for: {{ event.name }} ({{ event.date_planted }})</h2>
+  {% if event.plot %}
+    <p class="monitoring-paragraph"><span class="monitoring-strong">Plot:</span> {{ event.plot.name }}</p>
+  {% endif %}
+
+  {% if monitoring_records %}
+    {% for record in monitoring_records %}
+      <hr class="monitoring-divider">
+      <div>
+        <h3 class="monitoring-subheading">🕓 {{ record.monitored_at|date:"F j, Y" }}</h3>
+        <p class="monitoring-paragraph"><span class="monitoring-strong">Monitored by:</span> {{ record.monitored_by }}</p>
+        <p class="monitoring-paragraph"><span class="monitoring-strong">Monitored At:</span> {{ record.monitored_at }}</p>
+        <p class="monitoring-paragraph"><span class="monitoring-strong">Health:</span> {{ record.health_status }}</p>
+        <p class="monitoring-paragraph"><span class="monitoring-strong">Threats:</span> {{ record.threats_observed }}</p>
+        <p class="monitoring-paragraph"><span class="monitoring-strong">Conservation:</span> {{ record.conservation_actions }}</p>
+        <p class="monitoring-paragraph"><span class="monitoring-strong">Notes:</span> {{ record.notes }}</p>
+        <p class="monitoring-paragraph"><span class="monitoring-strong">All alive count:</span> {{ record.alive_count }}</p>
+        <p class="monitoring-paragraph"><span class="monitoring-strong">All dead count:</span> {{ record.dead_count }}</p>
+
+        <h4 class="monitoring-tree-heading">🌱 Trees in this Record</h4>
+        <ul class="monitoring-tree-list">
+          {% for detail in record.monitored_trees.all %}
+            <li class="monitoring-tree-item">
+              <span class="monitoring-strong">{{ detail.tree.name }}</span>: 
+              {{ detail.alive_count }} alive, {{ detail.dead_count }} dead 
+              {% if detail.notes %} — <em>{{ detail.notes }}</em>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+
+        {% if record.photos.all %}
+          <h4 class="monitoring-tree-heading">📸 Photos</h4>
+          <div class="monitoring-photo-grid">
+            {% for photo in record.photos.all %}
+              <div class="monitoring-photo-card">
+                <img src="{{ photo.image.url }}" alt="Monitoring photo" width="150">
+                {% if photo.caption %}
+                  <p class="monitoring-photo-caption">{{ photo.caption }}</p>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="monitoring-paragraph">No monitoring records for this event.</p>
+  {% endif %}
+</div>
+{% endblock %}

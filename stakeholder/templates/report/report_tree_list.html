@@ -1,0 +1,191 @@
+{% extends "dash.html" %}
+
+{% block content %}
+<style>
+  .monitored-tree-container {
+    padding: 1.2rem;
+    background-color: #0f1c0f;
+    border-radius: 6px;
+    border: 1.5px solid #2e4e2e;
+    box-shadow: 0 0 8px rgba(30, 50, 30, 0.5);
+    font-size: 11px;
+  }
+
+  .monitored-tree-container h1 {
+    color: #8df98d;
+    font-size: 14px;
+    border-bottom: 1px solid #355335;
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.5px;
+  }
+
+  .add-monitoring-btn {
+    display: inline-block;
+    margin-bottom: 1rem;
+    margin-right: 6px;
+    padding: 4px 10px;
+    background-color: #234f23;
+    color: #eaffea;
+    font-weight: 600;
+    font-size: 10px;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+
+  .add-monitoring-btn:hover {
+    background-color: #3e7f3e;
+    color: #ffffff;
+  }
+
+  form.search-form {
+    margin-bottom: 1.2rem;
+  }
+
+  input[type="search"] {
+    padding: 4px 6px;
+    font-size: 11px;
+    border: 1px solid #4b7f4b;
+    border-radius: 4px;
+    width: 100%;
+    max-width: 360px;
+    background-color: #1a2f1a;
+    color: #cfffcc;
+    transition: border-color 0.2s ease;
+  }
+
+  input[type="search"]:focus {
+    border-color: #b6f2b6;
+    outline: none;
+  }
+
+  .tree-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+  }
+
+  .tree-list li {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 0.8rem;
+    background-color: #132c13;
+    border-left: 4px solid #4caf50;
+    border-radius: 3px;
+    font-size: 11px;
+    transition: background-color 0.2s ease;
+  }
+
+  .tree-list li:hover {
+    background-color: #1e4727;
+  }
+
+  .tree-list a {
+    text-decoration: none;
+    color: #baffba;
+    font-weight: 600;
+    font-size: 11px;
+  }
+
+  .tree-list a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+  }
+
+  .no-trees {
+    font-style: italic;
+    color: #aaa;
+    padding: 0.8rem;
+    background-color: #1f2f1f;
+    border-left: 3px solid #777;
+    margin-top: 1rem;
+    border-radius: 3px;
+    font-size: 11px;
+  }
+
+  .pagination {
+    margin-top: 1.2rem;
+    display: flex;
+    gap: 0.6rem;
+    list-style: none;
+    padding-left: 0;
+    font-size: 10px;
+  }
+
+  .pagination li a {
+    background-color: #203820;
+    color: #aaffaa;
+    padding: 0.3rem 0.6rem;
+    border-radius: 3px;
+    text-decoration: none;
+  }
+
+  .pagination li a:hover {
+    background-color: #355f35;
+    color: #ffffff;
+  }
+
+  .pagination li {
+    color: #9be79b;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+  }
+</style>
+
+<div class="monitored-tree-container">
+  <h1>🎯 Monitored Trees Report</h1>
+
+  <a href="{% url 'report_page' %}" class="add-monitoring-btn">← Back to Reports</a>
+
+  <form method="get" action="" class="search-form" role="search" aria-label="Search monitored trees">
+    <input
+      type="search"
+      name="q"
+      placeholder="Search trees by name..."
+      value="{{ search_query }}"
+      autocomplete="off"
+      aria-describedby="searchHelp"
+    >
+  </form>
+
+  {% if trees %}
+    <ul class="tree-list">
+      {% for tree in trees %}
+        <li>
+          <a href="{% url 'tree_reports_list' tree.pk %}">
+            {{ tree.name }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+
+    {% if is_paginated %}
+      <nav aria-label="Page navigation">
+        <ul class="pagination">
+          {% if page_obj.has_previous %}
+            <li>
+              <a href="?q={{ search_query }}&page={{ page_obj.previous_page_number }}">
+                ◀ Previous
+              </a>
+            </li>
+          {% endif %}
+          <li>
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+          </li>
+          {% if page_obj.has_next %}
+            <li>
+              <a href="?q={{ search_query }}&page={{ page_obj.next_page_number }}">
+                Next ▶
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="no-trees">⚠️ No trees under monitoring yet.</div>
+  {% endif %}
+</div>
+{% endblock %}

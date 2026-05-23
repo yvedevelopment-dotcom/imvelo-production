@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trees with {{ conservation_status }}</title>
+    <style>
+        /* General Body Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f4f1;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* Container for centering content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* Heading Styles */
+        h1 {
+            text-align: center;
+            font-size: 2em;
+            color: #2b7a77;
+            margin-bottom: 40px;
+            font-weight: bold;
+        }
+
+        /* Tree List */
+        .tree-list {
+            padding: 0;
+            list-style-type: none;
+            margin-top: 20px;
+        }
+
+        .tree-item {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .tree-item:hover {
+            transform: translateY(-10px);
+        }
+
+        .tree-item img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-right: 2px solid #f0f4f1;
+            margin-right: 15px;
+        }
+
+        .tree-item .tree-info {
+            padding: 10px;
+            flex-grow: 1;
+        }
+
+        .tree-item .tree-info h2 {
+            font-size: 1.2em;
+            color: #2b7a77;
+            margin: 0;
+            text-align: left;
+        }
+
+        /* Pagination Button */
+        .pagination {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .pagination button {
+            padding: 10px 20px;
+            background-color: #2b7a77;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.1em;
+        }
+
+        .pagination button:hover {
+            background-color: #4caf50;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .tree-item {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .tree-item img {
+                width: 100px;
+                height: 100px;
+                margin-right: 10px;
+            }
+
+            .tree-item .tree-info h2 {
+                font-size: 0.9em;
+            }
+
+            h1 {
+                font-size: 1.2em;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Trees with {{ conservation_status }}</h1>
+
+        <!-- Tree List -->
+        <ul class="tree-list">
+            {% for tree in trees %}
+                <li class="tree-item">
+                    <img src="{{ tree.images.first.image.url }}" alt="Image for {{ tree.name }}">
+                    <div class="tree-info">
+                        <!-- Link the tree name to the detail view -->
+                        <h2><a href="{% url 'tree_detail' tree.pk %}" style="text-decoration: none; color: inherit;">{{ tree.name }}</a></h2>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Pagination Buttons -->
+        <div class="pagination">
+            {% if trees.has_next %}
+                <a href="?page={{ trees.next_page_number }}" class="pagination-button">
+                    <button>More</button>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}

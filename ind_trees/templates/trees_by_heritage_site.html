@@ -1,0 +1,15 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trees at {{ heritage_site.name }}</title>
+</head>
+<body>
+    <h1>Trees at {{ heritage_site.name }}</h1>
+    <ul>
+        {% for tree in trees %}
+            <li><a href="{% url 'tree_detail' tree.id %}">{{ tree.name }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

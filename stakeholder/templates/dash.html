@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Imvelo Intelligence System</title>
+    {% block extra_head %}{% endblock %}
+  
+    <style>
+  /* Reset */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #e9eeea;
+    color: #1f1f1f;
+    overflow: hidden;
+  }
+
+  /* Main container */
+  .imvelo-dash-container {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .imvelo-dash-sidebar {
+    width: 240px;          /* fixed width */
+    min-width: 240px;      /* prevent collapsing */
+    flex: 0 0 240px;       /* no grow, no shrink */
+    background-color: #1a2c1f;
+    color: #e6ffe6;
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 3px solid #324b37;
+    box-shadow: 3px 0 10px rgba(0,0,0,0.4);
+    z-index: 10;
+    overflow-y: auto;      /* scroll sidebar if content overflows */
+  }
+
+  .imvelo-dash-account {
+    margin-bottom: 35px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #5a7d5f;
+  }
+
+  .imvelo-dash-account h2 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #cde3c8;
+    text-transform: uppercase;
+  }
+
+  .imvelo-dash-nav {
+    flex-grow: 1;
+  }
+
+  .imvelo-dash-nav ul {
+    list-style: none;
+  }
+
+  .imvelo-dash-nav li {
+    margin-bottom: 14px;
+  }
+
+  .imvelo-dash-nav a {
+    display: block;
+    padding: 12px 18px 12px 22px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #c8f3d4;
+    text-decoration: none;
+    background-color: #2d4634;
+    border-left: 6px solid transparent;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+  }
+
+  .imvelo-dash-nav a::before {
+    content: "▸";
+    position: absolute;
+    left: 10px;
+    color: #9ef1b2;
+    font-size: 14px;
+  }
+
+  .imvelo-dash-nav a:hover {
+    background-color: #3c6147;
+    color: #ffffff;
+    border-left: 6px solid #9ef1b2;
+  }
+
+  .imvelo-dash-nav a.active {
+    background-color: #4e7456;
+    border-left: 6px solid #a5f7b9;
+    color: #ffffff;
+  }
+
+  /* Main content */
+  .imvelo-dash-main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    height: 100%;
+    min-width: 0; /* ensure flex shrink doesn’t happen */
+  }
+
+  .imvelo-dash-main::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0,50,0,0.3);
+    z-index: 0;
+  }
+
+  /* Header */
+  .imvelo-dash-header {
+    background-color: rgba(255,255,255,0.85);
+    padding: 25px 35px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 4px solid #4a5f4e;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0; /* never shrink header */
+  }
+
+  .imvelo-dash-header h1 {
+    font-size: 26px;
+    font-weight: bold;
+    color: #1b2d1e;
+    letter-spacing: 0.5px;
+  }
+
+  .imvelo-dash-user {
+    font-size: 16px;
+    color: #333;
+    background-color: #dfe7e1;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-weight: 500;
+    border: 1px solid #999;
+  }
+
+  /* Content area */
+  .imvelo-dash-content {
+    flex-grow: 1;
+    overflow-y: auto; /* scroll content only */
+    padding: 30px 40px;
+    background-color: rgba(215,221,214,0.95);
+    border-radius: 10px;
+    margin: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 1;
+    min-width: 0; /* prevent sidebar shrink */
+  }
+
+  .imvelo-dash-content::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .imvelo-dash-content::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 4px;
+  }
+
+  .imvelo-dash-content::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  /* Responsive adjustments */
+  @media screen and (max-width: 768px) {
+    .imvelo-dash-container {
+      flex-direction: column;
+    }
+
+    .imvelo-dash-sidebar {
+      width: 100%;
+      flex: 0 0 100%;
+      flex-direction: row;
+      overflow-x: auto;
+      padding: 15px 10px;
+      border-right: none;
+      border-bottom: 3px solid #324b37;
+    }
+
+    .imvelo-dash-account {
+      display: none;
+    }
+
+    .imvelo-dash-nav ul {
+      display: flex;
+      gap: 12px;
+    }
+
+    .imvelo-dash-nav li {
+      margin-bottom: 0;
+    }
+
+    .imvelo-dash-nav a {
+      font-size: 14px;
+      padding: 10px 15px;
+      border-left: 4px solid transparent;
+      box-shadow: none;
+    }
+
+    .imvelo-dash-nav a::before {
+      display: none;
+    }
+  }
+</style>
+
+</head>
+<body>
+  <div class="imvelo-dash-container">
+    <!-- Sidebar -->
+    <aside class="imvelo-dash-sidebar">
+      <div class="imvelo-dash-account">
+        <h2>Account Info</h2>
+      </div>
+      <nav class="imvelo-dash-nav">
+        <ul>
+          <li><a href="{% url 'tree_list-m' %}">Trees</a></li>
+          <li><a href="{% url 'treeplantingevent_list-m' %}">Planting Events</a></li>
+          <li><a href="{% url 'monitoring_schedule_list-m' %}">Monitoring Schedules</a></li>
+          <li><a href="{% url 'monitored_tree_list-d' %}">Monitored Trees</a></li>
+          <li><a href="{% url 'land-menu' %}">Monitored Lands</a></li>
+          <li><a href="{% url 'report_page' %}">Reports</a></li>
+          <li><a href="#">Weather</a></li>
+          <li><a href="#">Alerts and Notifications</a></li>
+          <li><a href="#">Terms and Conditions</a></li>
+          <li><a href="#">Logout</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="imvelo-dash-main">
+      <header class="imvelo-dash-header">
+        <h1>Imvelo Intelligence Monitoring</h1>
+        <div class="imvelo-dash-user">Welcome, <strong>{{ user.username }}</strong></div>
+      </header>
+
+      <section class="imvelo-dash-content">
+        {% block content %}
+        <p>This space will show dynamic land/tree data overlays soon.</p>
+        {% endblock %}
+      </section>
+    </main>
+  </div>
+</body>
+</html>

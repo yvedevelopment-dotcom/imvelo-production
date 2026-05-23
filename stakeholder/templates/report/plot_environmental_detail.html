@@ -1,0 +1,131 @@
+{% extends "dash.html" %}
+
+{% block content %}
+<style>
+/* General Fonts and Colors */
+body, h1, h2, h3, h4, p, span {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #2c3e50;
+    line-height: 1.6;
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #1f3c88;
+}
+
+h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 2px solid #1f3c88;
+    padding-bottom: 5px;
+}
+
+p {
+    font-size: 1rem;
+    margin: 4px 0;
+}
+
+hr {
+    margin: 25px 0;
+    border: 0;
+    height: 1px;
+    background: #ccc;
+}
+
+/* Card Layout for Sections */
+.section-card {
+    background-color: #fdfdfd;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* Labels */
+.label {
+    font-weight: 600;
+    color: #1f3c88;
+}
+
+/* Monitoring Photos */
+.monitoring-photos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.monitoring-photos img {
+    width: 200px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .monitoring-photos img {
+        width: 100%;
+        height: auto;
+    }
+}
+</style>
+
+<div class="section-card">
+    <h1>Environmental Data & Monitoring</h1>
+
+    <h3>Environmental Data</h3>
+    {% if environmental_data %}
+    <p><span class="label">Soil Type:</span> {{ environmental_data.soil_type }}</p>
+    <p><span class="label">Soil pH:</span> {{ environmental_data.soil_pH }}</p>
+    <p><span class="label">Fertility Level:</span> {{ environmental_data.fertility_level }}</p>
+    <p><span class="label">Rainfall (mm):</span> {{ environmental_data.rainfall_mm }}</p>
+    <p><span class="label">Temperature (°C):</span> {{ environmental_data.temperature_c }}</p>
+    <p><span class="label">Water Source Proximity:</span> {{ environmental_data.water_source_proximity }}</p>
+    <p><span class="label">Biodiversity Notes:</span> {{ environmental_data.biodiversity_notes|default:"-" }}</p>
+    {% else %}
+    <p>No environmental data available.</p>
+    {% endif %}
+</div>
+
+<div class="section-card">
+    <h3>Latest Monitoring Record</h3>
+    {% if latest_monitoring %}
+    <p><span class="label">Monitored At:</span> {{ latest_monitoring.monitored_at }}</p>
+    <p><span class="label">Monitored By:</span> {{ latest_monitoring.monitored_by }}</p>
+    <p><span class="label">Vegetation Cover:</span> {{ latest_monitoring.vegetation_cover|default:"-" }}</p>
+    <p><span class="label">Invasive Species Present:</span> {{ latest_monitoring.invasive_species_present }}</p>
+    <p><span class="label">Signs of Deforestation:</span> {{ latest_monitoring.signs_of_deforestation }}</p>
+    <p><span class="label">Signs of Fire:</span> {{ latest_monitoring.signs_of_fire }}</p>
+    <p><span class="label">Illegal Activities:</span> {{ latest_monitoring.illegal_activities_observed|default:"-" }}</p>
+    <p><span class="label">Wildlife Presence:</span> {{ latest_monitoring.wildlife_presence|default:"-" }}</p>
+    <p><span class="label">Soil Erosion:</span> {{ latest_monitoring.soil_erosion_signs }}</p>
+    <p><span class="label">Erosion Notes:</span> {{ latest_monitoring.erosion_notes|default:"-" }}</p>
+    <p><span class="label">Water Conditions:</span> {{ latest_monitoring.water_conditions|default:"-" }}</p>
+    <p><span class="label">Human Activity Notes:</span> {{ latest_monitoring.human_activity_notes|default:"-" }}</p>
+    <p><span class="label">Threats Identified:</span> {{ latest_monitoring.threats_identified|default:"-" }}</p>
+    <p><span class="label">Recommended Actions:</span> {{ latest_monitoring.recommended_actions|default:"-" }}</p>
+    <p><span class="label">Intervention:</span> {{ latest_monitoring.intervention|default:"-" }}</p>
+    <p><span class="label">Water Quality:</span> {{ latest_monitoring.water_quality|default:"-" }}</p>
+    <p><span class="label">Air Quality:</span> {{ latest_monitoring.air_quality|default:"-" }}</p>
+    <p><span class="label">Weather Conditions:</span> {{ latest_monitoring.weather_conditions|default:"-" }}</p>
+    <p><span class="label">Next Monitoring Due:</span> {{ latest_monitoring.next_monitoring_due|default:"-" }}</p>
+
+    {% if latest_monitoring_photos %}
+    <div class="monitoring-photos">
+        {% for photo in latest_monitoring_photos %}
+            <img src="{{ photo.image.url }}" alt="{{ photo.caption }}">
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% else %}
+    <p>No monitoring records yet.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

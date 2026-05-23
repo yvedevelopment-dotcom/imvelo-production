@@ -1,0 +1,29 @@
+{% load static %}
+<!-- Top Contact Bar -->
+<div class="imvelo-topbar d-flex justify-content-between align-items-center px-3 px-md-5 py-2">
+    <span class="imvelo-topbar-text"><i class="bi bi-telephone-fill me-1"></i> (268) 7656-7890</span>
+    <span class="imvelo-topbar-text"><i class="bi bi-envelope-fill me-1"></i> info.imvelo@yveeswatini.africa</span>
+</div>
+
+<!-- Main Navbar -->
+<nav class="imvelo-navbar navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand fw-bold fs-3" href="{% url 'index' %}">
+            <i class="bi bi-tree-fill me-2"></i>Imvelo
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#imveloNavbar" aria-controls="imveloNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="imveloNavbar">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link active" href="{% url 'index' %}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'tree_list' %}">Trees</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'category-list' %}">Categories</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'treeplantingevent' %}">Events</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'monitoring_menu' %}">Monitoring</a></li>
+                <li class="nav-item"><a class="nav-link btn btn-outline-light rounded-pill px-3 ms-2" href="{% url 'login' %}">Login</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>

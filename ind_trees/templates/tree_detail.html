@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="imvelo-detail-hero text-white text-center d-flex align-items-center" style="background: linear-gradient(135deg, #2d6a4f, #1b4632); min-height: 35vh;">
+  <div class="container">
+    <h1 class="display-4 fw-bold animate__animated animate__fadeInDown">{{ tree.name }}</h1>
+    <p class="lead mt-3 animate__animated animate__fadeInUp">Discover the story of this indigenous tree</p>
+  </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-5" style="background-color: #f8f9fa;">
+  <div class="container">
+
+    <!-- QR Code Card -->
+    <div class="row justify-content-center mb-5">
+      <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm border-0 rounded-4 p-4 text-center">
+          <h3 class="fw-bold mb-3" style="color: #2d6a4f;">Scan to View</h3>
+          <img src="{% url 'tree_qr' tree.id %}" id="qr-image" alt="QR Code for {{ tree.name }}" class="img-fluid rounded-3 mb-3" style="max-width: 200px;">
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-success rounded-pill" onclick="downloadQRCode('png')"><i class="bi bi-download me-2"></i>Download PNG</button>
+            <button class="btn btn-outline-success rounded-pill" onclick="downloadQRCode('pdf')"><i class="bi bi-file-earmark-pdf me-2"></i>Download PDF</button>
+            <button class="btn btn-success rounded-pill" onclick="shareQRCode()"><i class="bi bi-share-fill me-2"></i>Share QR Code</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tree Images Gallery -->
+    {% if tree_images %}
+    <div class="mb-5">
+      <h2 class="fw-bold mb-4" style="color: #2d6a4f;"><i class="bi bi-images me-2"></i>Gallery</h2>
+      <div class="row g-3">
+        {% for image in tree_images %}
+          <div class="col-md-6 col-lg-4">
+            <div class="card border-0 rounded-4 overflow-hidden shadow-sm">
+              <img src="{{ image.image.url }}" alt="Image for {{ tree.name }}" class="card-img-top" style="height: 250px; object-fit: cover;">
+              {% if image.caption %}
+                <div class="card-body text-center py-2">
+                  <p class="text-muted mb-0 fst-italic">{{ image.caption }}</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Categories Badges -->
+    <div class="mb-4">
+      <h5 class="fw-bold mb-2" style="color: #2d6a4f;">Categories</h5>
+      <div>
+        {% for category in tree.categories.all %}
+          <span class="badge bg-success rounded-pill px-3 py-2 me-2 mb-2">{{ category.name }}</span>
+        {% empty %}
+          <span class="text-muted">No categories</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Core Information Card -->
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+      <h3 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-info-circle-fill me-2"></i>Tree Information</h3>
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Description:</strong> {{ tree.tree_description }}</p>
+          <p><strong>Origin:</strong> {{ tree.origin }}</p>
+          <p><strong>Location:</strong> {{ tree.location }}</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Conservation Status:</strong> <span class="badge bg-warning text-dark">{{ tree.conservation_status.name }}</span></p>
+          <p><strong>Species:</strong> {{ tree.species.common_name }} (<em>{{ tree.species.scientific_name }}</em>)</p>
+          <p><strong>Family:</strong> {{ tree.species.family }}</p>
+          <p><strong>IUCN Status:</strong> {{ tree.species.iucn_status }}</p>
+          <p><strong>Species Description:</strong> {{ tree.species.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Heritage Sites -->
+    {% if tree.heritage_sites.all %}
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+      <h3 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-geo-alt-fill me-2"></i>Associated Heritage Sites</h3>
+      <ul class="list-group list-group-flush">
+        {% for site in tree.heritage_sites.all %}
+          <li class="list-group-item border-0 ps-0"><i class="bi bi-building me-2 text-success"></i>{{ site.name }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <!-- Detailed Sections as Accordion (collapsible, mobile-friendly) -->
+    <div class="accordion" id="treeDetailsAccordion">
+
+      <!-- General Uses -->
+      <div class="accordion-item border-0 mb-3">
+        <h2 class="accordion-header" id="headingUses">
+          <button class="accordion-button collapsed rounded-4 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUses" aria-expanded="false" aria-controls="collapseUses" style="color: #2d6a4f; font-weight: 600;">
+            <i class="bi bi-tools me-2"></i>General Uses
+          </button>
+        </h2>
+        <div id="collapseUses" class="accordion-collapse collapse" aria-labelledby="headingUses" data-bs-parent="#treeDetailsAccordion">
+          <div class="accordion-body bg-white rounded-bottom-4">
+            <p class="mb-0">{{ tree.general_use }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Benefits -->
+      <div class="accordion-item border-0 mb-3">
+        <h2 class="accordion-header" id="headingBenefits">
+          <button class="accordion-button collapsed rounded-4 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBenefits" aria-expanded="false" aria-controls="collapseBenefits" style="color: #2d6a4f; font-weight: 600;">
+            <i class="bi bi-plus-circle me-2"></i>Benefits (Pros)
+          </button>
+        </h2>
+        <div id="collapseBenefits" class="accordion-collapse collapse" aria-labelledby="headingBenefits" data-bs-parent="#treeDetailsAccordion">
+          <div class="accordion-body bg-white rounded-bottom-4">
+            <p class="mb-0">{{ tree.pros }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Challenges -->
+      <div class="accordion-item border-0 mb-3">
+        <h2 class="accordion-header" id="headingChallenges">
+          <button class="accordion-button collapsed rounded-4 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseChallenges" aria-expanded="false" aria-controls="collapseChallenges" style="color: #2d6a4f; font-weight: 600;">
+            <i class="bi bi-exclamation-triangle me-2"></i>Challenges (Cons)
+          </button>
+        </h2>
+        <div id="collapseChallenges" class="accordion-collapse collapse" aria-labelledby="headingChallenges" data-bs-parent="#treeDetailsAccordion">
+          <div class="accordion-body bg-white rounded-bottom-4">
+            <p class="mb-0">{{ tree.cons }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Medical Benefits -->
+      <div class="accordion-item border-0 mb-3">
+        <h2 class="accordion-header" id="headingMedical">
+          <button class="accordion-button collapsed rounded-4 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMedical" aria-expanded="false" aria-controls="collapseMedical" style="color: #2d6a4f; font-weight: 600;">
+            <i class="bi bi-heart-pulse me-2"></i>Medical Benefits
+          </button>
+        </h2>
+        <div id="collapseMedical" class="accordion-collapse collapse" aria-labelledby="headingMedical" data-bs-parent="#treeDetailsAccordion">
+          <div class="accordion-body bg-white rounded-bottom-4">
+            <p class="mb-3">{{ tree.medical_benefits }}</p>
+            {% if medical_images %}
+            <div class="row g-3">
+              {% for image in medical_images %}
+                <div class="col-md-4">
+                  <div class="card border-0 rounded-3 overflow-hidden shadow-sm">
+                    <img src="{{ image.image.url }}" alt="Medical image" class="card-img-top" style="height: 180px; object-fit: cover;">
+                    {% if image.caption %}<div class="card-body py-1 text-center"><small class="text-muted">{{ image.caption }}</small></div>{% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Cultural Significance -->
+      <div class="accordion-item border-0 mb-3">
+        <h2 class="accordion-header" id="headingCultural">
+          <button class="accordion-button collapsed rounded-4 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCultural" aria-expanded="false" aria-controls="collapseCultural" style="color: #2d6a4f; font-weight: 600;">
+            <i class="bi bi-people-fill me-2"></i>Cultural Significance
+          </button>
+        </h2>
+        <div id="collapseCultural" class="accordion-collapse collapse" aria-labelledby="headingCultural" data-bs-parent="#treeDetailsAccordion">
+          <div class="accordion-body bg-white rounded-bottom-4">
+            <p class="mb-3">{{ tree.cultural_significance }}</p>
+            {% if cultural_images %}
+            <div class="row g-3">
+              {% for image in cultural_images %}
+                <div class="col-md-4">
+                  <div class="card border-0 rounded-3 overflow-hidden shadow-sm">
+                    <img src="{{ image.image.url }}" alt="Cultural image" class="card-img-top" style="height: 180px; object-fit: cover;">
+                    {% if image.caption %}<div class="card-body py-1 text-center"><small class="text-muted">{{ image.caption }}</small></div>{% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Ecological Role -->
+      <div class="accordion-item border-0 mb-3">
+        <h2 class="accordion-header" id="headingEcological">
+          <button class="accordion-button collapsed rounded-4 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEcological" aria-expanded="false" aria-controls="collapseEcological" style="color: #2d6a4f; font-weight: 600;">
+            <i class="bi bi-tree me-2"></i>Ecological Role
+          </button>
+        </h2>
+        <div id="collapseEcological" class="accordion-collapse collapse" aria-labelledby="headingEcological" data-bs-parent="#treeDetailsAccordion">
+          <div class="accordion-body bg-white rounded-bottom-4">
+            <p class="mb-0">{{ tree.ecological_role }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Threats & Conservation -->
+      <div class="accordion-item border-0 mb-3">
+        <h2 class="accordion-header" id="headingThreats">
+          <button class="accordion-button collapsed rounded-4 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThreats" aria-expanded="false" aria-controls="collapseThreats" style="color: #2d6a4f; font-weight: 600;">
+            <i class="bi bi-shield-exclamation me-2"></i>Threats & Conservation Efforts
+          </button>
+        </h2>
+        <div id="collapseThreats" class="accordion-collapse collapse" aria-labelledby="headingThreats" data-bs-parent="#treeDetailsAccordion">
+          <div class="accordion-body bg-white rounded-bottom-4">
+            <p class="mb-3">{{ tree.threats_and_conservation_efforts }}</p>
+            {% if threats_images %}
+            <div class="row g-3">
+              {% for image in threats_images %}
+                <div class="col-md-4">
+                  <div class="card border-0 rounded-3 overflow-hidden shadow-sm">
+                    <img src="{{ image.image.url }}" alt="Threats image" class="card-img-top" style="height: 180px; object-fit: cover;">
+                    {% if image.caption %}<div class="card-body py-1 text-center"><small class="text-muted">{{ image.caption }}</small></div>{% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Myths -->
+      <div class="accordion-item border-0 mb-3">
+        <h2 class="accordion-header" id="headingMyths">
+          <button class="accordion-button collapsed rounded-4 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMyths" aria-expanded="false" aria-controls="collapseMyths" style="color: #2d6a4f; font-weight: 600;">
+            <i class="bi bi-chat-quote me-2"></i>Myths & Folklore
+          </button>
+        </h2>
+        <div id="collapseMyths" class="accordion-collapse collapse" aria-labelledby="headingMyths" data-bs-parent="#treeDetailsAccordion">
+          <div class="accordion-body bg-white rounded-bottom-4">
+            <p class="mb-0">{{ tree.myths }}</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center mt-5">
+      <a href="{% url 'tree_list' %}" class="btn btn-success btn-lg rounded-pill px-5 shadow">
+        <i class="bi bi-arrow-left me-2"></i>Back to Tree List
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- JavaScript for QR Download/Share (kept exactly as before) -->
+<script>
+  function downloadQRCode(format) {
+      let url = "{% url 'tree_qr' tree.id %}".replace("tree_qr", "tree_qr_download") + "?format=" + format;
+      let link = document.createElement("a");
+      link.href = url;
+      link.download = "{{ tree.name }}_qr." + format;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+  }
+
+  function shareQRCode() {
+      if (navigator.share) {
+          navigator.share({
+              title: "QR Code for {{ tree.name }}",
+              text: "Scan this QR code to learn more about {{ tree.name }}",
+              url: "{% url 'tree_qr' tree.id %}"
+          }).then(() => console.log("Shared successfully"))
+            .catch(error => console.error("Error sharing:", error));
+      } else {
+          alert("Your browser does not support the Web Share API.");
+      }
+  }
+</script>
+
+<!-- Minimal custom styles (unique classes, no conflicts) -->
+<style>
+  .imvelo-detail-hero {
+    box-shadow: inset 0 0 0 1000px rgba(0,0,0,0.2);
+  }
+  .accordion-button:not(.collapsed) {
+    background-color: #e8f5e9;
+    box-shadow: none;
+  }
+  .accordion-button:focus {
+    box-shadow: none;
+    border-color: #2d6a4f;
+  }
+</style>
+
+{% endblock %}

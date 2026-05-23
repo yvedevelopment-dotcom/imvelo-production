@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Hero -->
+<section class="imvelo-plot-hero text-white text-center d-flex align-items-center" style="background: linear-gradient(135deg, #2d6a4f, #1b4632); min-height: 30vh;">
+  <div class="container">
+    <h1 class="display-4 fw-bold animate__animated animate__fadeInDown">{{ record.plot.name }}</h1>
+    <p class="lead mt-3 animate__animated animate__fadeInUp">Monitoring Report</p>
+    <p class="text-white-50"><i class="bi bi-geo-alt-fill me-1"></i>{{ record.plot.location }}</p>
+  </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-5" style="background-color: #f8f9fa;">
+  <div class="container">
+
+    <!-- Map & First Image -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden h-100">
+          {% if record.plot.latitude and record.plot.longitude %}
+            <div id="monitoring-map" style="height: 300px;"></div>
+          {% else %}
+            <div class="bg-light d-flex align-items-center justify-content-center" style="height: 300px;">
+              <i class="bi bi-map text-muted" style="font-size: 3rem;"></i>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden h-100">
+          {% with first_image=record.plot.images.first %}
+            {% if first_image and first_image.image %}
+              <img src="{{ first_image.image.url }}" class="card-img-top" alt="First photo" style="height: 300px; object-fit: cover;">
+              {% if first_image.caption %}
+                <div class="card-body py-2 text-center">
+                  <small class="text-muted fst-italic">{{ first_image.caption }}</small>
+                </div>
+              {% endif %}
+            {% else %}
+              <div class="bg-light d-flex align-items-center justify-content-center" style="height: 300px;">
+                <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+              </div>
+            {% endif %}
+          {% endwith %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Map Script -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        {% if record.plot.latitude and record.plot.longitude %}
+        var map = L.map('monitoring-map', {
+          scrollWheelZoom: false,
+          zoomControl: true
+        }).setView([{{ record.plot.latitude }}, {{ record.plot.longitude }}], 16);
+
+        // Satellite tiles (Esri)
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          attribution: '&copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community',
+          maxZoom: 20
+        }).addTo(map);
+
+        L.marker([{{ record.plot.latitude }}, {{ record.plot.longitude }}]).addTo(map)
+          .bindPopup('<strong>{{ record.plot.name|escapejs }}</strong>');
+
+        {% if record.plot.boundary_coordinates %}
+        var boundaryCoords = {{ record.plot.boundary_coordinates|safe }};
+        var polygon = L.polygon(boundaryCoords, {
+          color: "#2d6a4f",
+          fillColor: "#6fbf8b",
+          fillOpacity: 0.35,
+          weight: 2
+        }).addTo(map);
+        map.fitBounds(polygon.getBounds().pad(0.1));
+        {% endif %}
+        {% endif %}
+      });
+    </script>
+
+    <!-- Monitoring Core Info -->
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+      <h3 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-clipboard-data me-2"></i>Monitoring Details</h3>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <ul class="list-unstyled mb-0">
+            <li class="mb-2"><strong>Monitored At:</strong> {{ record.monitored_at|date:"F j, Y - H:i" }}</li>
+            <li class="mb-2"><strong>Monitored By:</strong> {{ record.monitored_by }}</li>
+            <li class="mb-2"><strong>Monitoring Schedule:</strong> {{ record.monitoring_schedule }}</li>
+            <li class="mb-2"><strong>Weather Conditions:</strong> {{ record.weather_conditions }}</li>
+          </ul>
+        </div>
+        <div class="col-md-6">
+          <ul class="list-unstyled mb-0">
+            <li class="mb-2"><strong>Vegetation Cover:</strong> {{ record.vegetation_cover }}</li>
+            <li class="mb-2"><strong>Invasive Species Present:</strong> 
+              {% if record.invasive_species_present %}<span class="badge bg-warning text-dark">Yes</span>{% else %}<span class="badge bg-success">No</span>{% endif %}
+            </li>
+            <li class="mb-2"><strong>Invasive Species Details:</strong> {{ record.invasive_species_details|default:"N/A" }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Environmental Observations -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-4 p-4 h-100">
+          <h4 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-tree-fill me-2"></i>Environmental Observations</h4>
+          <ul class="list-unstyled mb-0">
+            <li class="mb-2"><strong>Signs of Deforestation:</strong> 
+              {% if record.signs_of_deforestation %}<span class="badge bg-danger">Yes</span>{% else %}<span class="badge bg-success">No</span>{% endif %}
+            </li>
+            <li class="mb-2"><strong>Signs of Fire:</strong> 
+              {% if record.signs_of_fire %}<span class="badge bg-danger">Yes</span>{% else %}<span class="badge bg-success">No</span>{% endif %}
+            </li>
+            <li class="mb-2"><strong>Soil Erosion Signs:</strong> 
+              {% if record.soil_erosion_signs %}<span class="badge bg-warning text-dark">Yes</span>{% else %}<span class="badge bg-success">No</span>{% endif %}
+            </li>
+            <li class="mb-2"><strong>Erosion Notes:</strong> {{ record.erosion_notes|default:"N/A" }}</li>
+            <li class="mb-2"><strong>Water Conditions:</strong> {{ record.water_conditions|default:"N/A" }}</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-4 p-4 h-100">
+          <h4 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-shield-exclamation me-2"></i>Threats & Actions</h4>
+          <ul class="list-unstyled mb-0">
+            <li class="mb-2"><strong>Illegal Activities:</strong> {{ record.illegal_activities_observed|default:"None" }}</li>
+            <li class="mb-2"><strong>Wildlife Presence:</strong> {{ record.wildlife_presence|default:"N/A" }}</li>
+            <li class="mb-2"><strong>Human Activity Notes:</strong> {{ record.human_activity_notes|default:"N/A" }}</li>
+            <li class="mb-2"><strong>Threats Identified:</strong> {{ record.threats_identified|default:"N/A" }}</li>
+            <li class="mb-2"><strong>Recommended Actions:</strong> {{ record.recommended_actions|default:"N/A" }}</li>
+            <li class="mb-2"><strong>Intervention:</strong> {{ record.intervention|default:"N/A" }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    {% if record.notes %}
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+      <h4 class="fw-bold mb-2" style="color: #2d6a4f;"><i class="bi bi-pencil-square me-2"></i>Additional Notes</h4>
+      <p class="text-muted mb-0">{{ record.notes }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Photo Gallery -->
+    {% with photos=record.plot.images.all %}
+      {% if photos.count > 1 %}
+      <div class="mb-4">
+        <h3 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-images me-2"></i>All Plot Photos</h3>
+        <div class="row g-3">
+          {% for photo in photos %}
+            {% if not forloop.first %}
+            <div class="col-md-4 col-6">
+              <div class="card border-0 rounded-4 overflow-hidden shadow-sm h-100">
+                <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                {% if photo.caption %}
+                  <div class="card-body py-2 text-center">
+                    <small class="text-muted fst-italic">{{ photo.caption }}</small>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Back Button -->
+    <div class="text-center mt-4">
+      <a href="{% url 'monitoring_record_list' %}" class="btn btn-outline-success btn-lg rounded-pill px-5">
+        <i class="bi bi-arrow-left me-2"></i>Back to Monitoring List
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- Scoped CSS -->
+<style>
+  .imvelo-plot-hero {
+    box-shadow: inset 0 0 0 1000px rgba(0,0,0,0.2);
+  }
+  .card {
+    transition: transform 0.2s ease, box-shadow 0.3s;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.08) !important;
+  }
+  .badge {
+    font-size: 0.85rem;
+    padding: 0.35em 0.65em;
+  }
+  #monitoring-map {
+    border-radius: 0.375rem;
+  }
+</style>
+{% endblock %}

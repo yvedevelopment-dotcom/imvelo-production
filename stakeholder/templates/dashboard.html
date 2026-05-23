@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Imvelo Monitoring Dashboard</title>
+    {% block extra_head %}{% endblock %}
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #e9edea;
+      color: #1f1f1f;
+    }
+
+    .imvelo-dashboard-container {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .imvelo-sidebar {
+      width: 260px;
+      background-color: #1a2c1f;
+      color: #e6ffe6;
+      padding: 25px 20px;
+      display: flex;
+      flex-direction: column;
+      border-right: 3px solid #324b37;
+      box-shadow: 3px 0 10px rgba(0, 0, 0, 0.4);
+      z-index: 10;
+    }
+
+    .imvelo-account-info h2 {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 35px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #5a7d5f;
+      color: #cde3c8;
+      text-transform: uppercase;
+    }
+
+    .imvelo-nav-links ul {
+      list-style: none;
+    }
+
+    .imvelo-nav-links li {
+      margin-bottom: 14px;
+    }
+
+    .imvelo-nav-links a {
+      display: block;
+      padding: 12px 18px 12px 22px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #c8f3d4;
+      text-decoration: none;
+      background-color: #2d4634;
+      border-left: 6px solid transparent;
+      border-radius: 4px;
+      transition: all 0.2s ease-in-out;
+      position: relative;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+    }
+
+    .imvelo-nav-links a::before {
+      content: "▸";
+      position: absolute;
+      left: 10px;
+      color: #9ef1b2;
+      font-size: 14px;
+    }
+
+    .imvelo-nav-links a:hover {
+      background-color: #3c6147;
+      color: #ffffff;
+      border-left: 6px solid #9ef1b2;
+    }
+
+    .imvelo-nav-links a.active {
+      background-color: #4e7456;
+      border-left: 6px solid #a5f7b9;
+      color: #ffffff;
+    }
+
+    .imvelo-main-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e4/Eswatini_location_map.svg');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      height: 100vh;
+    }
+
+    .imvelo-main-content::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-color: rgba(0, 50, 0, 0.3);
+      z-index: 0;
+    }
+
+    .imvelo-header {
+      background-color: rgba(255, 255, 255, 0.85);
+      padding: 25px 35px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 4px solid #4a5f4e;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+      position: relative;
+      z-index: 1;
+    }
+
+    .imvelo-header h1 {
+      font-size: 26px;
+      font-weight: bold;
+      color: #1b2d1e;
+      letter-spacing: 0.5px;
+    }
+
+    .imvelo-user-welcome {
+      font-size: 16px;
+      color: #333;
+      background-color: #dfe7e1;
+      padding: 8px 15px;
+      border-radius: 6px;
+      font-weight: 500;
+      border: 1px solid #999;
+    }
+
+    .imvelo-content-placeholder {
+      flex-grow: 1;
+      padding: 30px 40px;
+      position: relative;
+      z-index: 1;
+      overflow-y: auto;
+      max-height: calc(100vh - 100px);
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 10px;
+      margin: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      color: #000;
+    }
+
+    .imvelo-content-placeholder::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .imvelo-content-placeholder::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 4px;
+    }
+
+    .imvelo-content-placeholder::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+
+    @media screen and (max-width: 768px) {
+      .imvelo-dashboard-container {
+        flex-direction: column;
+      }
+
+      .imvelo-sidebar {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 15px 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        border-right: none;
+        border-bottom: 3px solid #324b37;
+      }
+
+      .imvelo-account-info {
+        display: none;
+      }
+
+      .imvelo-nav-links ul {
+        display: flex;
+        gap: 12px;
+      }
+
+      .imvelo-nav-links li {
+        margin-bottom: 0;
+      }
+
+      .imvelo-nav-links a {
+        font-size: 14px;
+        padding: 10px 15px;
+        border-left: 4px solid transparent;
+        box-shadow: none;
+      }
+
+      .imvelo-nav-links a::before {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="imvelo-dashboard-container">
+    <!-- Sidebar -->
+    <aside class="imvelo-sidebar">
+      <div class="imvelo-account-info">
+        <h2>Account Info</h2>
+      </div>
+      <nav class="imvelo-nav-links">
+        <ul>
+          <li><a href="{% url 'tree_list-m' %}">Trees</a></li>
+          <li><a href="{% url 'treeplantingevent_list-m' %}">Planting Events</a></li>
+          <li><a href="{% url 'monitoring_schedule_list-m' %}">Monitoring Schedules</a></li>
+          <li><a href="{% url 'monitored_tree_list-d' %}">Monitored Trees</a></li>
+          <li><a href="{% url 'land-menu' %}">Monitored Lands</a></li>
+          <li><a href="{% url 'report_page' %}">Reports</a></li>
+          <li><a href="#">Weather</a></li>
+          <li><a href="#">Alerts and Notifications</a></li>
+          <li><a href="#">Terms and Conditions</a></li>
+          <li><a href="{% url 'logout' %}">Logout</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="imvelo-main-content">
+      <header class="imvelo-header">
+        <h1>Imvelo Monitoring Database</h1>
+        <div class="imvelo-user-welcome">Welcome, <strong>{{ user.username }}</strong></div>
+      </header>
+
+      <section class="imvelo-content-placeholder">
+        {% block content %}
+        <p>This space will show dynamic land/tree data overlays soon.</p>
+        {% endblock %}
+      </section>
+    </main>
+  </div>
+</body>
+</html>

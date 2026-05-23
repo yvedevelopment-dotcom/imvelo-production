@@ -1,0 +1,50 @@
+{% extends "dash.html" %}
+
+{% block content %}
+<h1 style="margin-bottom:20px;">Unified Plot Report: {{ plot.name }}</h1>
+
+<hr>
+
+<h2>1. Standard Plot Report</h2>
+<p><strong>Total Trees Planted:</strong> {{ total_trees_planted }}</p>
+<p><strong>Species Planted:</strong> {{ tree_species|join:", " }}</p>
+<p><strong>Total Planting Events:</strong> {{ total_planting_events }}</p>
+
+<h3>Planting Events</h3>
+{% for event in planting_events %}
+    <p>{{ event.name }} - {{ event.date_planted }} - Trees: {{ event.treeplantingdetail_set.all|length }}</p>
+{% endfor %}
+
+<hr>
+
+<h2>2. Plot Environmental Details & Monitoring</h2>
+{% if environmental_data %}
+    <p><strong>Soil Type:</strong> {{ environmental_data.soil_type }}</p>
+    <p><strong>pH:</strong> {{ environmental_data.soil_pH }}</p>
+    <p><strong>Fertility:</strong> {{ environmental_data.fertility_level }}</p>
+{% endif %}
+
+{% if latest_monitoring %}
+    <p><strong>Last Monitored At:</strong> {{ latest_monitoring.monitored_at }}</p>
+    <p><strong>Last Monitored By:</strong> {{ latest_monitoring.monitored_by }}</p>
+{% endif %}
+
+<hr>
+
+<h2>3. AI Report from GEE Metrics</h2>
+{% if ai_gee_report %}
+    <pre style="white-space: pre-wrap;">{{ ai_gee_report }}</pre>
+{% else %}
+    <p>No AI GEE report available.</p>
+{% endif %}
+
+<hr>
+
+<h2>4. Overall AI Analysis</h2>
+{% if overall_ai_report %}
+    <pre style="white-space: pre-wrap;">{{ overall_ai_report }}</pre>
+{% else %}
+    <p>No overall AI report available.</p>
+{% endif %}
+
+{% endblock %}

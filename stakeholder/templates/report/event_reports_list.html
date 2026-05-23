@@ -1,0 +1,45 @@
+{% extends "dash.html" %}
+{% block content %}
+<h1>Reports for Event: {{ event.name }}</h1>
+
+{% if cached_report %}
+    <h3>Latest Report</h3>
+    <p>Last generated: {{ cached_report.last_generated }}</p>
+    <a href="{% url 'event_cached_report' cached_report.pk %}" class="btn btn-primary">
+        View Latest Report
+    </a>
+{% else %}
+    <p>No report generated yet.</p>
+{% endif %}
+
+<hr>
+<h3>All Generated Reports</h3>
+{% if reports %}
+    <table class="table">
+    {% for report in reports %}
+        <tr>
+            <td>{{ report.created_at|date:"Y-m-d H:i" }}</td>
+            <td>Monitoring as of: {{ report.last_monitoring_at|date:"Y-m-d" }}</td>
+            <td>
+                <a href="{% url 'event_report_detail' report.pk %}" class="btn btn-sm btn-info">View</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
+{% else %}
+    <p>No historical reports.</p>
+{% endif %}
+
+<hr>
+<!-- This button now opens the report page directly (no redirect) -->
+<a href="{% url 'event_full_report' event.pk %}" class="btn btn-success">
+    {% if cached_report %}View Current Report{% else %}Generate New Report{% endif %}
+</a>
+
+{% if cached_report %}
+  <!-- Force regeneration only if a report already exists -->
+  <a href="{% url 'event_full_report' event.pk %}?force=true" class="btn btn-outline-danger btn-sm ms-2">
+    Force Regenerate
+  </a>
+{% endif %}
+{% endblock %}

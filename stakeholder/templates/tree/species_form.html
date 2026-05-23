@@ -1,0 +1,100 @@
+{% extends "dash.html" %}
+{% load static %}
+{% block content %}
+<style>
+  .species-form-wrapper {
+    max-width: 480px;
+    margin: 40px auto;
+    padding: 24px 28px;
+    background-color: #1e2e1e;
+    border: 1px solid #3a4f3a;
+    border-left: 6px solid #264d26;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 30, 0, 0.3);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #d0e7d0;
+  }
+
+  .species-form-wrapper h2 {
+    text-align: center;
+    color: #9ddc9d;
+    font-weight: 700;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #3d5c3d;
+    padding-bottom: 6px;
+  }
+
+  .species-form-wrapper form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .species-form-wrapper label {
+    font-weight: 600;
+    margin-top: 14px;
+    color: #b6d6b6;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+  }
+
+  .species-form-wrapper input,
+  .species-form-wrapper select,
+  .species-form-wrapper textarea {
+    width: 100%;
+    padding: 10px 12px;
+    margin-top: 6px;
+    border: 1px solid #4c704c;
+    border-radius: 4px;
+    background-color: #122212;
+    color: #d5f6d5;
+    font-size: 1rem;
+  }
+
+  .species-form-wrapper input:focus,
+  .species-form-wrapper select:focus,
+  .species-form-wrapper textarea:focus {
+    outline: none;
+    border-color: #7dc17d;
+    background-color: #162c16;
+  }
+
+  .species-form-wrapper button[type="submit"] {
+    margin-top: 24px;
+    padding: 12px;
+    background-color: #264d26;
+    color: #f0fff0;
+    font-weight: bold;
+    font-size: 1rem;
+    border: 1px solid #3d5c3d;
+    border-radius: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, transform 0.1s;
+  }
+
+  .species-form-wrapper button:hover {
+    background-color: #3a6e3a;
+    transform: scale(1.02);
+  }
+
+  .species-form-wrapper button:active {
+    background-color: #1a351a;
+    transform: scale(0.98);
+  }
+</style>
+
+<div class="species-form-wrapper">
+  <button type="submit"><a href="{% url 'tree_create-m' %}" class="back-button">↩️ Back</a></button>
+  <h2>🪖 Add New Species</h2>
+  
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
+    <button type="submit">💾 Save</button>
+  </form>
+</div>
+{% endblock %}

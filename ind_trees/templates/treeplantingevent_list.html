@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="imvelo-events-hero text-white text-center d-flex align-items-center" style="background: linear-gradient(135deg, #2d6a4f, #1b4632); min-height: 30vh;">
+  <div class="container">
+    <h1 class="display-4 fw-bold animate__animated animate__fadeInDown">Tree Planting Events</h1>
+    <p class="lead mt-3 animate__animated animate__fadeInUp">Join hands to restore Eswatini’s green heritage</p>
+  </div>
+</section>
+
+<!-- Events Grid -->
+<section class="py-5" style="background-color: #f8f9fa;">
+  <div class="container">
+    
+    {% if events %}
+      <div class="row g-4">
+        {% for event in events %}
+          <div class="col-md-6 col-lg-4">
+            <div class="card imvelo-event-card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+              {% if event.first_image %}
+                <img src="{{ event.first_image.image.url }}" alt="{{ event.first_image.caption|default:event.name }}" class="card-img-top" style="height: 200px; object-fit: cover;" loading="lazy">
+              {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                  <i class="bi bi-tree text-success" style="font-size: 3rem;"></i>
+                </div>
+              {% endif %}
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title fw-bold" style="color: #2d6a4f;">{{ event.name }}</h5>
+                <p class="card-text text-muted mb-1"><i class="bi bi-calendar-event me-2"></i>{{ event.date_planted }}</p>
+                <p class="card-text text-muted mb-1"><i class="bi bi-person me-2"></i>{{ event.organizer }}</p>
+                <p class="card-text text-muted mb-3"><i class="bi bi-geo-alt me-2"></i>{{ event.location }}</p>
+                <a href="{% url 'treeplantingevent_detail' event.pk %}" class="btn btn-outline-success rounded-pill mt-auto align-self-start">
+                  View Details <i class="bi bi-arrow-right-short"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-center py-5">
+        <i class="bi bi-calendar-x" style="font-size: 3rem; color: #2d6a4f;"></i>
+        <p class="mt-3 text-muted fs-5">No upcoming events at the moment. Check back soon!</p>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+<!-- Minimal custom styles (scoped) -->
+<style>
+  .imvelo-events-hero {
+    box-shadow: inset 0 0 0 1000px rgba(0,0,0,0.2);
+  }
+  .imvelo-event-card {
+    transition: transform 0.2s ease, box-shadow 0.3s;
+  }
+  .imvelo-event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 30px rgba(0,0,0,0.1) !important;
+  }
+</style>
+
+{% endblock %}

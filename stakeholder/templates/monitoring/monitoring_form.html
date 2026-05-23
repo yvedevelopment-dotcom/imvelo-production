@@ -1,0 +1,152 @@
+{% extends 'dash.html' %}
+{% load static %}
+{% block content %}
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<div class="container my-3" style="max-width:1100px;">
+  <div class="card shadow border-0 p-3" style="background-color:#1e2e1f;">
+    <h3 class="mb-3 text-success fw-bold">📝 Add New Monitoring Record</h3>
+    <hr class="mb-3 border-success">
+
+    <form method="post" enctype="multipart/form-data" id="monitoringForm" class="needs-validation" novalidate>
+      {% csrf_token %}
+
+      <!-- MAIN FIELDS GRID -->
+      <div class="row g-3">
+        <!-- same fields as before -->
+        <div class="col-lg-4 col-md-6"><label for="id_plot" class="form-label">Plot</label>{{ form.plot }}</div>
+        <div class="col-lg-4 col-md-6"><label for="id_monitored_by" class="form-label">Monitored By</label>{{ form.monitored_by }}</div>
+        <div class="col-lg-4 col-md-6"><label for="id_monitoring_schedule" class="form-label">Monitoring Schedule</label>{{ form.monitoring_schedule }}</div>
+        <div class="col-lg-4 col-md-6"><label for="id_intervention" class="form-label">Intervention</label>{{ form.intervention }}</div>
+        <div class="col-lg-4 col-md-6"><label for="id_weather_conditions" class="form-label">Weather Conditions</label>{{ form.weather_conditions }}</div>
+        <div class="col-lg-4 col-md-6"><label for="id_next_monitoring_due" class="form-label">Next Monitoring Due</label>{{ form.next_monitoring_due }}</div>
+        <div class="col-lg-6 col-md-12"><label for="id_vegetation_cover" class="form-label">Vegetation Cover</label>{{ form.vegetation_cover }}</div>
+        <div class="col-lg-6 col-md-12"><label for="id_invasive_species_details" class="form-label">Invasive Species Details</label>{{ form.invasive_species_details }}</div>
+        <div class="col-lg-6 col-md-12"><label for="id_illegal_activities_observed" class="form-label">Illegal Activities Observed</label>{{ form.illegal_activities_observed }}</div>
+        <div class="col-lg-6 col-md-12"><label for="id_wildlife_presence" class="form-label">Wildlife Presence</label>{{ form.wildlife_presence }}</div>
+        <div class="col-lg-6 col-md-12"><label for="id_threats_identified" class="form-label">Threats Identified</label>{{ form.threats_identified }}</div>
+        <div class="col-lg-6 col-md-12"><label for="id_recommended_actions" class="form-label">Recommended Actions</label>{{ form.recommended_actions }}</div>
+        <div class="col-12"><label for="id_notes" class="form-label">Additional Notes</label>{{ form.notes }}</div>
+      </div>
+
+      <hr class="my-3 border-success">
+
+      <!-- PHOTOS FORMSET -->
+      <h5 class="text-success mb-2 fw-semibold">📷 Monitoring Photos</h5>
+      <div id="photo-formset" class="row g-3">
+        {% for form in photo_formset.forms %}
+          <div class="col-lg-4 col-md-6 photo-form d-flex flex-column gap-1">
+            {{ form.image.label_tag }}{{ form.image }}
+            <img class="img-preview mb-1" style="max-height:120px; border-radius:6px;" />
+            {{ form.caption.label_tag }}{{ form.caption }}
+            <button type="button" class="btn btn-danger btn-sm mt-1 remove-photo">Remove</button>
+          </div>
+        {% endfor %}
+      </div>
+      <button type="button" class="btn btn-info mt-2" id="add-photo">+ Add Photo</button>
+
+      <!-- Buttons -->
+      <div class="d-flex justify-content-end mt-3 gap-2">
+        <button type="submit" class="btn btn-success btn-lg fw-semibold">💾 Save Record</button>
+        <a href="{% url 'monitoring_record_list-m' %}" class="btn btn-secondary btn-lg">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+$(document).ready(function () {
+    // Initialize Select2
+    $('#id_plot, #id_monitoring_schedule, #id_intervention').select2({
+      placeholder: 'Select an option...',
+      allowClear: true,
+      width: '100%'
+    });
+
+    $('input, select, textarea').addClass('form-control');
+    $('textarea').attr('rows', 2);
+
+    // Function to update image preview
+    function previewImage(input, previewElement) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $(previewElement).attr('src', e.target.result).show();
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // Dynamic photo formset with live preview
+    var photoFormIndex = {{ photo_formset.total_form_count }};
+    $('#add-photo').click(function() {
+        var formHtml = `
+        <div class="col-lg-4 col-md-6 photo-form d-flex flex-column gap-1">
+            <label for="id_photos-${photoFormIndex}-image">Image:</label>
+            <input type="file" name="photos-${photoFormIndex}-image" class="form-control photo-input" id="id_photos-${photoFormIndex}-image">
+            <img class="img-preview mb-1" style="max-height:120px; border-radius:6px;" />
+            <label for="id_photos-${photoFormIndex}-caption">Caption:</label>
+            <input type="text" name="photos-${photoFormIndex}-caption" class="form-control" id="id_photos-${photoFormIndex}-caption">
+            <button type="button" class="btn btn-danger btn-sm mt-1 remove-photo">Remove</button>
+        </div>`;
+        $('#photo-formset').append(formHtml);
+        photoFormIndex++;
+    });
+
+    // Remove photo
+    $(document).on('click', '.remove-photo', function() {
+        $(this).closest('.photo-form').remove();
+    });
+
+    // Live preview for existing and dynamically added inputs
+    $(document).on('change', '.photo-input', function() {
+        var preview = $(this).siblings('.img-preview');
+        previewImage(this, preview);
+    });
+});
+</script>
+
+<style>
+/* Labels */
+.form-label { font-weight:600; color:#c0e0a0; margin-bottom:4px; font-size:0.9rem; }
+
+/* Inputs, selects, textareas */
+.form-control { border-radius:6px; border:1px solid #556b2f; background:#2b3a2b; color:#e0e0d1; padding:0.45rem; font-size:0.9rem; }
+.form-control:focus { border-color:#6b8e23; box-shadow:0 0 0 0.15rem rgba(107,142,35,0.3); background:#2b3a2b; color:#fff; }
+
+/* Select2 */
+.select2-container--default .select2-selection--single {
+    height:36px; border-radius:6px; border:1px solid #556b2f; background:#2b3a2b; color:#e0e0d1; padding-left:6px;
+}
+.select2-selection__arrow { top:6px !important; }
+.select2-selection__rendered { line-height:32px; color:#e0e0d1; }
+
+/* Card */
+.card { border-radius:10px; padding:2rem; background-color:#1e2e1f; }
+
+/* Headings */
+h3 { color:#a8d08d; font-size:1.5rem; margin-bottom:1rem; }
+
+/* Buttons */
+button.btn-success { background-color:#4b8e4b; border-color:#4b8e4b; }
+button.btn-success:hover { background-color:#6b8e23; border-color:#6b8e23; }
+.btn-secondary { background-color:#556b2f; border-color:#556b2f; color:#f0f0e0; }
+.btn-secondary:hover { background-color:#6b8e23; border-color:#6b8e23; }
+.btn-info { background-color:#3a6b3a; border-color:#3a6b3a; color:#f0f0e0; }
+.btn-info:hover { background-color:#4b8e4b; border-color:#4b8e4b; }
+
+/* Photo form spacing */
+.photo-form { display:flex; flex-direction:column; gap:0.35rem; }
+.img-preview { display:block; object-fit:cover; }
+
+/* Row spacing */
+.row.g-3 > .col-lg-6, .row.g-3 > .col-lg-4 { display:flex; flex-direction:column; }
+</style>
+
+{% endblock %}

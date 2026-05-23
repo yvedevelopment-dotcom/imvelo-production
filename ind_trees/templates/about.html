@@ -1,0 +1,120 @@
+
+
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="imvelo-about-hero text-white text-center d-flex align-items-center" style="background: linear-gradient(135deg, #1b4632, #2d6a4f); min-height: 40vh;">
+  <div class="container">
+    <h1 class="display-4 fw-bold animate__animated animate__fadeInDown">About Imvelo Monitoring System</h1>
+    <p class="lead mt-3 animate__animated animate__fadeInUp">Discover the stories, science, and soul of Eswatini’s indigenous trees.</p>
+  </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-5" style="background-color: #f8f9fa;">
+  <div class="container">
+    
+    <!-- Overview Card -->
+    <div class="imvelo-about-card card shadow-sm border-0 rounded-4 p-4 mb-5 bg-white">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <h2 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-tree-fill me-2"></i>Overview</h2>
+          <p class="text-muted fs-5 lh-base">
+            Imvelo is a comprehensive, database-driven platform for cataloging and exploring the indigenous trees of Eswatini. 
+            It provides users with in-depth information about each tree, including its ecological role, cultural and medicinal significance, 
+            conservation status, and connections to heritage sites.
+          </p>
+        </div>
+        <div class="col-lg-6 text-center">
+          <img src="{% static 'ba.png' %}" alt="Eswatini landscape" class="img-fluid rounded-4 shadow" style="max-height: 250px; object-fit: cover;">
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Features & User Guide Columns -->
+    <div class="row g-4">
+      <!-- Key Features -->
+      <div class="col-lg-6">
+        <div class="imvelo-about-card card shadow-sm border-0 rounded-4 p-4 h-100">
+          <h3 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-star-fill me-2"></i>Key Features</h3>
+          <ul class="list-unstyled">
+            <li class="mb-3 d-flex align-items-start">
+              <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+              <span><strong>Tree Listings:</strong> Browse and search a rich collection of indigenous trees.</span>
+            </li>
+            <li class="mb-3 d-flex align-items-start">
+              <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+              <span><strong>Detailed Profiles:</strong> View images, benefits, and conservation efforts.</span>
+            </li>
+            <li class="mb-3 d-flex align-items-start">
+              <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+              <span><strong>Categories:</strong> Explore trees by ecological roles or cultural significance.</span>
+            </li>
+            <li class="mb-3 d-flex align-items-start">
+              <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+              <span><strong>Heritage Sites:</strong> Discover sites and their linked tree species.</span>
+            </li>
+            <li class="mb-3 d-flex align-items-start">
+              <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+              <span><strong>Conservation Status:</strong> Stay informed about each species’ protection level.</span>
+            </li>
+            <li class="d-flex align-items-start">
+              <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+              <span><strong>Newsletter:</strong> Subscribe to get updates on new data and conservation news.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- User Guide -->
+      <div class="col-lg-6">
+        <div class="imvelo-about-card card shadow-sm border-0 rounded-4 p-4 h-100">
+          <h3 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-book-fill me-2"></i>User Guide</h3>
+          <ul class="list-unstyled">
+            <li class="mb-3 d-flex align-items-start">
+              <i class="bi bi-arrow-right-circle-fill text-success me-2 mt-1"></i>
+              <span><strong>Homepage:</strong> The landing page features the latest trees; use the search bar to find specific species.</span>
+            </li>
+            <li class="mb-3 d-flex align-items-start">
+              <i class="bi bi-arrow-right-circle-fill text-success me-2 mt-1"></i>
+              <span><strong>Tree Details:</strong> Click any tree to view its full profile, images, and benefits.</span>
+            </li>
+            <li class="mb-3 d-flex align-items-start">
+              <i class="bi bi-arrow-right-circle-fill text-success me-2 mt-1"></i>
+              <span><strong>Categories & Heritage:</strong> Filter trees by category or explore heritage sites.</span>
+            </li>
+            <li class="mb-3 d-flex align-items-start">
+              <i class="bi bi-arrow-right-circle-fill text-success me-2 mt-1"></i>
+              <span><strong>Conservation:</strong> Learn about ongoing efforts and statuses.</span>
+            </li>
+            <li class="d-flex align-items-start">
+              <i class="bi bi-arrow-right-circle-fill text-success me-2 mt-1"></i>
+              <span><strong>Subscribe:</strong> Enter your email to receive updates.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Minimal custom styles (only for the card hover and hero animation) -->
+<style>
+  .imvelo-about-hero {
+    box-shadow: inset 0 0 0 1000px rgba(0,0,0,0.2);
+  }
+  .imvelo-about-card {
+    transition: transform 0.2s ease, box-shadow 0.3s;
+  }
+  .imvelo-about-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.08) !important;
+  }
+</style>
+
+{% endblock %}

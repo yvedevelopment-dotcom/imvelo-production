@@ -1,0 +1,150 @@
+{% extends "dash.html" %}
+
+{% block content %}
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .monitoring-header {
+    margin-bottom: 2rem;
+    border-left: 6px solid #4b7f4b;
+    padding-left: 1rem;
+  }
+
+  .monitoring-header h1 {
+    font-size: 1.8rem;
+    color: #161d16;
+    margin: 0;
+  }
+
+  .record-box {
+    background-color: #101d10;
+    border: 2px solid #2f4f2f;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 0 5px #203820;
+  }
+
+  .record-box h3 {
+    color: #9fff9f;
+    font-size: 1.2rem;
+    border-bottom: 1px dashed #355335;
+    padding-bottom: 0.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .record-box p {
+    margin: 0.3rem 0;
+    color: #e0f0e0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .record-box strong {
+    color: #b3ffb3;
+  }
+
+  .photo-preview {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .photo-preview img {
+    max-width: 200px;
+    border-radius: 5px;
+    border: 2px solid #355335;
+    box-shadow: 0 0 5px #1e301e;
+  }
+
+  .photo-preview p {
+    margin: 0.2rem 0;
+    font-size: 0.85rem;
+    color: #aaffaa;
+    text-align: center;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 2rem;
+    padding: 0.5rem 1rem;
+    background-color: #2b4d2b;
+    color: #d0ffd0;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border: 1px solid #4b7f4b;
+    transition: background-color 0.3s ease;
+  }
+
+  .back-link:hover {
+    background-color: #3e6e3e;
+    color: #ffffff;
+  }
+
+  .empty-message {
+    color: #aaa;
+    font-style: italic;
+    padding: 1rem;
+    background-color: #1a2a1a;
+    border-left: 4px solid #555;
+    margin-top: 1rem;
+  }
+</style>
+
+<div class="monitoring-header">
+  <h1>📝 Monitoring Details for: {{ tree.name }}</h1>
+</div>
+
+{% if monitoring_records %}
+  {% for record in monitoring_records %}
+    <div class="record-box">
+      <h3>🗓️ {{ record.monitored_at|date:"F d, Y H:i" }}</h3>
+      <p><strong>planting event:</strong> {{ record.planting_event }}</p>
+      <p><strong>Monitored by:</strong> {{ record.monitored_by }}</p>
+      <p><strong>Monitored at:</strong> {{ record.monitored_at }}</p>
+      <p><strong>Health Status:</strong> {{ record.health_status }}</p>
+      <p><strong>Alive:</strong> {{ record.alive_count }} | <strong>Dead:</strong> {{ record.dead_count }}</p>
+      {% if record.threats_observed %}
+        <p><strong>Threats Observed:</strong> {{ record.threats_observed }}</p>
+      {% endif %}
+      {% if record.conservation_actions %}
+        <p><strong>Conservation Actions:</strong> {{ record.conservation_actions }}</p>
+      {% endif %}
+      {% if record.notes %}
+        <p><strong>Notes:</strong> {{ record.notes }}</p>
+      {% endif %}
+      {% if record.intervention %}
+        <p><strong>Intervention:</strong> {{ record.intervention }}</p>
+      {% endif %}
+      {% if record.monitoring_schedule %}
+        <p><strong>Schedule:</strong> {{ record.monitoring_schedule }}</p>
+      {% endif %}
+      {% if record.planting_event %}
+        <p><strong>Planting Event:</strong> {{ record.planting_event }}</p>
+      {% endif %}
+
+      {% if record.photos.all %}
+        <div class="photo-preview">
+          {% for photo in record.photos.all %}
+            <div>
+              <img src="{{ photo.image.url }}" alt="{{ photo.caption }}">
+              {% if photo.caption %}
+                <p><em>{{ photo.caption }}</em></p>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="empty-message">⚠️ No monitoring records found for this tree.</div>
+{% endif %}
+
+<a href="{% url 'monitored_tree_list-d' %}" class="back-link">🔙 Back to Monitored Tree List</a>
+{% endblock %}

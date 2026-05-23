@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="imvelo-detail-hero text-white text-center d-flex align-items-center" style="background: linear-gradient(135deg, #2d6a4f, #1b4632); min-height: 30vh;">
+  <div class="container">
+    <h1 class="display-4 fw-bold animate__animated animate__fadeInDown">Monitoring Detail</h1>
+    <p class="lead mt-3 animate__animated animate__fadeInUp">Record #{{ record.pk }} — {{ record.monitored_at|date:"F j, Y" }}</p>
+  </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-5" style="background-color: #f8f9fa;">
+  <div class="container">
+
+    <!-- Core Info Card -->
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+      <div class="row g-4">
+        <div class="col-md-6">
+          <h5 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-tree-fill me-2"></i>Trees</h5>
+          <p class="mb-2">{{ tree_names }}</p>
+
+          <h5 class="fw-bold mt-4 mb-2" style="color: #2d6a4f;"><i class="bi bi-calendar-check me-2"></i>Timing</h5>
+          <p class="mb-1"><strong>Monitored At:</strong> {{ record.monitored_at }}</p>
+          <p class="mb-1"><strong>Schedule:</strong> {{ record.monitoring_schedule|default:"Not set" }}</p>
+        </div>
+        <div class="col-md-6">
+          <h5 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-person-check me-2"></i>Responsible</h5>
+          <p class="mb-2"><strong>Monitored By:</strong> {{ record.monitored_by }}</p>
+          <p class="mb-2"><strong>Plot:</strong> {{ record.plot|default:"—" }}</p>
+          <p class="mb-2"><strong>Planting Event:</strong> {{ record.planting_event|default:"—" }}</p>
+          <p class="mb-2"><strong>Intervention:</strong> {{ record.intervention|default:"—" }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Health & Counts Card -->
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+      <div class="row g-4">
+        <div class="col-sm-6">
+          <h5 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-heart-pulse me-2"></i>Health</h5>
+          <p class="mb-2"><strong>Health Status:</strong> 
+            <span class="badge {% if record.health_status == 'Healthy' %}bg-success{% elif record.health_status == 'At Risk' %}bg-warning text-dark{% else %}bg-secondary{% endif %} rounded-pill px-3 py-2">{{ record.health_status }}</span>
+          </p>
+        </div>
+        <div class="col-sm-6">
+          <h5 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-bar-chart me-2"></i>Counts</h5>
+          <p class="mb-1"><strong>Alive:</strong> {{ record.alive_count }}</p>
+          <p class="mb-1"><strong>Dead:</strong> {{ record.dead_count }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Observations & Actions Card -->
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+      <h5 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-exclamation-triangle me-2"></i>Threats & Actions</h5>
+      <p class="mb-2"><strong>Threats Observed:</strong> {{ record.threats_observed|default:"None recorded" }}</p>
+      <p><strong>Conservation Actions:</strong> {{ record.conservation_actions|default:"None recorded" }}</p>
+    </div>
+
+    <!-- Notes Card -->
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+      <h5 class="fw-bold mb-2" style="color: #2d6a4f;"><i class="bi bi-journal-text me-2"></i>Notes</h5>
+      <p class="mb-0">{{ record.notes|default:"No additional notes." }}</p>
+    </div>
+
+    <!-- Photos -->
+    {% if photos %}
+    <div class="mb-4">
+      <h3 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-images me-2"></i>Monitoring Photos</h3>
+      <div class="row g-3">
+        {% for photo in photos %}
+          <div class="col-md-4 col-6">
+            <div class="card border-0 rounded-4 overflow-hidden shadow-sm">
+              <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+              {% if photo.caption %}
+                <div class="card-body py-2 text-center">
+                  <small class="text-muted fst-italic">{{ photo.caption }}</small>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="text-center mt-4">
+      <a href="{% url 'monitored_tree_list' %}" class="btn btn-outline-success btn-lg rounded-pill px-5">
+        <i class="bi bi-arrow-left me-2"></i>Back to Monitored Trees
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- Minimal scoped style -->
+<style>
+  .imvelo-detail-hero {
+    box-shadow: inset 0 0 0 1000px rgba(0,0,0,0.2);
+  }
+</style>
+
+{% endblock %}

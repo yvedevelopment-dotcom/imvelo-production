@@ -1,0 +1,191 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imvelo Monitoring System</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <!-- Animate.css for subtle animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <!-- htmx -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- Custom Imvelo styles (no clashes) -->
+    <style>
+        /* ---- Header ---- */
+        .imvelo-topbar {
+            background: #1b4632;
+            color: #d4edda;
+            font-size: 0.9rem;
+            letter-spacing: 0.3px;
+        }
+        .imvelo-topbar-text {
+            transition: color 0.2s;
+        }
+        .imvelo-topbar-text:hover {
+            color: #ffffff;
+        }
+        .imvelo-navbar {
+            background: linear-gradient(135deg, #2d6a4f 0%, #1b4632 100%);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding-top: 0.8rem;
+            padding-bottom: 0.8rem;
+        }
+        .imvelo-navbar .navbar-brand {
+            color: #fff !important;
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+        .imvelo-navbar .navbar-brand:hover {
+            transform: scale(1.03);
+        }
+        .imvelo-navbar .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            margin: 0 0.3rem;
+            padding: 0.5rem 1rem !important;
+            border-radius: 0.4rem;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .imvelo-navbar .nav-link:hover,
+        .imvelo-navbar .nav-link.active {
+            background-color: rgba(255,255,255,0.15);
+            color: #fff !important;
+        }
+        .imvelo-navbar .btn-outline-light {
+            border-color: rgba(255,255,255,0.7);
+            transition: all 0.3s;
+        }
+        .imvelo-navbar .btn-outline-light:hover {
+            background-color: #fff;
+            color: #1b4632 !important;
+        }
+        @media (max-width: 991.98px) {
+            .imvelo-navbar .navbar-collapse {
+                background: #1b4632;
+                padding: 1rem;
+                border-radius: 0 0 0.5rem 0.5rem;
+                margin-top: 0.5rem;
+            }
+        }
+
+        /* ---- Footer ---- */
+        .imvelo-footer {
+            background: linear-gradient(160deg, #0b2b1f 0%, #143d28 100%);
+            font-size: 0.95rem;
+        }
+        .imvelo-footer-text {
+            color: #b8d4c3;
+            line-height: 1.6;
+        }
+        .imvelo-social-icon {
+            display: inline-block;
+            width: 38px;
+            height: 38px;
+            line-height: 38px;
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-radius: 50%;
+            margin-right: 8px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        .imvelo-social-icon:hover {
+            background: #ffc107;
+            color: #000;
+            transform: translateY(-3px);
+        }
+        .imvelo-footer-links a {
+            color: #cfdfd5;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-block;
+            padding: 2px 0;
+        }
+        .imvelo-footer-links a:hover {
+            color: #ffc107;
+            padding-left: 5px;
+        }
+        .imvelo-footer-contact li {
+            margin-bottom: 0.5rem;
+            color: #cfdfd5;
+        }
+        .imvelo-footer-contact i {
+            color: #ffc107;
+        }
+        .imvelo-newsletter-form .form-control {
+            border-radius: 0.3rem 0 0 0.3rem;
+            border: none;
+        }
+        .imvelo-newsletter-form .btn-warning {
+            background-color: #ffc107;
+            border: none;
+            font-weight: 600;
+        }
+        .imvelo-footer-bottom-link {
+            color: #a3c2b2;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        .imvelo-footer-bottom-link:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        /* Smooth transition for htmx swaps */
+        #tree-grid-container .tree-card {
+            transition: all 0.3s ease;
+        }
+        #tree-grid-container .tree-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px rgba(0,0,0,0.1);
+        }
+        .htmx-request .tree-card {
+            opacity: 0.6;
+        }
+        .imvelo-tree-card {
+  transition: transform 0.2s ease, box-shadow 0.3s;
+}
+.imvelo-tree-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 30px rgba(0,0,0,0.1) !important;
+}
+.htmx-request .imvelo-tree-card {
+  opacity: 0.6;
+}
+.imvelo-page-hero {
+  box-shadow: inset 0 0 0 1000px rgba(0,0,0,0.2);
+}
+.imvelo-tree-card {
+  transition: transform 0.2s ease, box-shadow 0.3s;
+}
+.imvelo-tree-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 30px rgba(0,0,0,0.1) !important;
+}
+.htmx-request .imvelo-tree-card {
+  opacity: 0.6;
+}
+    </style>
+</head>
+<body>
+
+{% include 'header.html' %}
+
+<main>
+{% block content %}{% endblock %}
+</main>
+
+{% include 'footer.html' %}
+
+<!-- Bootstrap JS (needed for navbar toggler) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

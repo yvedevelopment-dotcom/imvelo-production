@@ -1,0 +1,67 @@
+{% extends "dash.html" %}
+{% load static %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+{% endblock %}
+
+{% block content %}
+<h1>Cached Report for Tree: {{ tree.name }}</h1>
+
+{% if from_cache %}
+    <p><em>This report was retrieved from cache (last generated at {{ cached_report.last_generated|default:"unknown" }}).</em></p>
+{% else %}
+    <p><em>This is a historical report generated on {{ report.created_at|default:"unknown" }}.</em></p>
+{% endif %}
+
+<!-- Map container -->
+{% if map_lat and map_lng %}
+  <div id="report-map" style="height: 400px; margin-bottom: 20px;"></div>
+{% endif %}
+
+<!-- Main Report Content (pre-rendered HTML) -->
+<div class="report-body">
+    {{ cached_html|safe }}
+</div>
+
+<hr>
+
+<!-- AI Summary -->
+<h2>AI Analysis Summary</h2>
+{% if ai_cleaned_lines %}
+    {% for line in ai_cleaned_lines %}
+        <p>{{ line }}</p>
+    {% endfor %}
+{% else %}
+    <p>No AI summary available.</p>
+{% endif %}
+
+<hr>
+<a href="{% url 'tree_reports_list' tree.pk %}" class="btn btn-secondary">Back to Reports List</a>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    {% if map_lat and map_lng %}
+      var map = L.map('report-map').setView([{{ map_lat }}, {{ map_lng }}], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+      }).addTo(map);
+      L.marker([{{ map_lat }}, {{ map_lng }}]).addTo(map)
+        .bindPopup('Plot Location');
+
+      // Add monitoring points if available
+      {% if monitoring_points %}
+        {% for point in monitoring_points %}
+          L.marker([{{ point.lat }}, {{ point.lng }}])
+            .addTo(map)
+            .bindPopup('{{ point.label }}');
+        {% endfor %}
+      {% endif %}
+    {% endif %}
+  });
+</script>
+{% endblock %}

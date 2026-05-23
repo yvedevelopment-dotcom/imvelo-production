@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="imvelo-page-hero text-white text-center d-flex align-items-center" style="background: linear-gradient(135deg, #2d6a4f, #1b4632); min-height: 35vh;">
+  <div class="container">
+    <h1 class="display-4 fw-bold animate__animated animate__fadeInDown">Explore Indigenous Trees</h1>
+    <p class="lead mt-3 animate__animated animate__fadeInUp">Discover Eswatini's living heritage, one tree at a time.</p>
+  </div>
+</section>
+
+<!-- Search and Grid -->
+<section class="py-5" style="background-color: #f8f9fa;">
+  <div class="container">
+    
+    <!-- Live Search -->
+    <div class="row justify-content-center mb-5">
+      <div class="col-md-8 col-lg-6">
+        <div class="input-group shadow-sm rounded-pill overflow-hidden">
+          <span class="input-group-text bg-white border-0 pe-1"><i class="bi bi-search text-success fs-5"></i></span>
+          <input type="text" id="tree-search" class="form-control border-0 py-3" 
+                 placeholder="Search by name, description, or category..." 
+                 hx-get="{% url 'tree_list' %}" 
+                 hx-trigger="keyup changed delay:300ms" 
+                 hx-target="#tree-grid-container" 
+                 hx-indicator="#search-spinner"
+                 name="q"
+                 value="{{ request.GET.q }}">
+          <button class="btn btn-success px-4" type="button" disabled>
+            <span id="search-spinner" class="htmx-indicator spinner-border spinner-border-sm" role="status"></span>
+            Search
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Container that gets replaced on search -->
+    <div id="tree-grid-container">
+      {% include 'partials/tree_list_grid.html' %}
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

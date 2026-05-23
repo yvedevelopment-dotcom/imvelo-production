@@ -1,0 +1,107 @@
+{% extends "dash.html" %}
+
+{% block content %}
+<style>
+  body {
+    font-family: "Courier New", Courier, monospace;
+  }
+
+  .plot-container {
+    padding: 1.5rem;
+    background: #111e11;
+    border: 2px solid #294229;
+    border-radius: 8px;
+    color: #cde0cd;
+    max-width: 960px;
+    margin: auto;
+    box-shadow: 0 0 8px rgba(50, 150, 50, 0.3);
+  }
+
+  .plot-container h1 {
+    font-size: 1.4rem;
+    color: #9eff9e;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #294229;
+    padding-bottom: 0.5rem;
+  }
+
+  .search-box {
+    margin-bottom: 1rem;
+  }
+
+  .search-box input {
+    padding: 0.4rem 0.6rem;
+    width: 100%;
+    max-width: 380px;
+    font-size: 0.9rem;
+    border: 2px solid #3f653f;
+    border-radius: 4px;
+    background-color: #1a2a1a;
+    color: #e0ffe0;
+  }
+
+  .plot-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .plot-list li {
+    background: #1e2f1e;
+    border-left: 6px solid #4caf50;
+    margin-bottom: 0.5rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 4px;
+    transition: background 0.2s;
+    font-size: 0.9rem;
+  }
+
+  .plot-list li:hover {
+    background: #263f26;
+  }
+
+  .plot-list a {
+    color: #b4ffb4;
+    font-weight: 700;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+  }
+
+  .plot-list a:hover {
+    text-decoration: underline;
+  }
+
+  .plot-meta {
+    color: #86c786;
+    font-size: 0.8rem;
+    margin-top: 0.2rem;
+    display: block;
+  }
+</style>
+
+<div class="plot-container">
+  <h1>🛰️ Plot/Land List View</h1>
+
+  <form method="get" class="search-box">
+    <input type="text" name="q" placeholder="🔍 Search coordinates or names..." value="{{ search_query }}">
+  </form>
+
+  {% if plots %}
+    <ul class="plot-list">
+      <a href="{% url 'land_create-m' %}">+ Add New Plot</a>
+      {% for plot in plots %}
+        <li>
+          <a href="{% url 'plot_detail-m' plot.pk %}">{{ plot.name }}</a>
+          <span class="plot-meta">🌐 {{ plot.location }} | 🗺️ {{ plot.area_hectares }} ha</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No tactical plots located in this region.</p>
+  {% endif %}
+</div>
+{% endblock %}

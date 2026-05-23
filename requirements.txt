@@ -1,0 +1,24 @@
+asgiref==3.8.1
+chardet==5.2.0
+Django==5.2.1
+django-appconf==1.1.0
+django-cookie-consent==0.8.0
+pillow==11.2.1
+qrcode==8.2
+reportlab==4.4.1
+sqlparse==0.5.3
+pytest
+djangorestframework==3.17.1
+django-htmx==1.27.0
+django-select2==8.4.1
+django-widget-tweaks==1.5.0
+psycopg2-binary==2.9.11
+pandas==2.3.1
+numpy==2.3.1
+matplotlib==3.10.3
+seaborn==0.13.2
+earthengine-api==1.7.1
+openai==1.95.1
+# Install GDAL with the specific version
+# pip install GDAL==$(gdal-config --version)
+geopy

@@ -1,0 +1,47 @@
+{% extends "dash.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <h1 class="text-success">🌳 Tree Monitoring Trends</h1>
+
+  <hr>
+
+  <!-- Summary Statistics -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+
+  <hr>
+
+  <!-- Chart Section -->
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <h5>🌱 Survival Trend (%)</h5>
+      <img src="data:image/png;base64,{{ survival_plot }}" class="img-fluid rounded border">
+    </div>
+    <div class="col-md-6 mb-4">
+      <h5>🩺 Health Score Over Time</h5>
+      <img src="data:image/png;base64,{{ health_plot }}" class="img-fluid rounded border">
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <h5>⚠️ Threat Frequency</h5>
+      <img src="data:image/png;base64,{{ threat_plot }}" class="img-fluid rounded border">
+    </div>
+    <div class="col-md-6 mb-4">
+      <h5>🛡️ Conservation Action Frequency</h5>
+      <img src="data:image/png;base64,{{ conservation_plot }}" class="img-fluid rounded border">
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <h5>💉 Intervention vs Health</h5>
+      <img src="data:image/png;base64,{{ intervention_plot }}" class="img-fluid rounded border">
+    </div>
+    <div class="col-md-6 mb-4">
+      <h5>🌳 Alive vs Dead Over Time</h5>
+      <img src="data:image/png;base64,{{ alive_dead_plot }}" class="img-fluid rounded border">
+    </div>
+  </div>
+
+</div>
+{% endblock %}

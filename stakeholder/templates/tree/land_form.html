@@ -1,0 +1,134 @@
+{% extends "dash.html" %}
+{% block content %}
+<style>
+  .env-form-wrapper {
+    max-width: 700px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: #191a19;
+    border: 2px solid #2e4d2e;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .env-form-wrapper h2 {
+    text-align: center;
+    color: #1f3a1f;
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+  }
+
+  .back-button-container {
+    text-align: left;
+    margin-bottom: 20px;
+  }
+
+  .back-button {
+    display: inline-block;
+    font-size: 0.9rem;
+    text-decoration: none;
+    color: #2e4d2e;
+    background-color: #e4f0e4;
+    padding: 8px 14px;
+    border: 1px solid #2e4d2e;
+    border-radius: 6px;
+    transition: background-color 0.2s ease-in-out;
+    font-weight: 500;
+  }
+
+  .back-button:hover {
+    background-color: #cfe2cf;
+    text-decoration: none;
+    color: #1b321b;
+  }
+
+  .env-form-wrapper form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 30px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #2d4d2d;
+    margin-bottom: 4px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 0.9rem;
+    padding: 8px 10px;
+    border: 1px solid #2d4d2d;
+    border-radius: 5px;
+    background-color: #f9fff9;
+    color: #1d2e1d;
+  }
+
+  /* Make textarea span full width */
+  .form-group.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .env-form-wrapper .btn-success {
+    grid-column: 1 / -1;
+    background-color: #2e4d2e;
+    border: none;
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 12px 20px;
+    margin-top: 10px;
+    border-radius: 6px;
+    color: white;
+    width: 100%;
+    transition: background 0.2s ease-in-out;
+    text-transform: uppercase;
+  }
+
+  .env-form-wrapper .btn-success:hover {
+    background-color: #3d6a3d;
+  }
+
+  /* Responsive behavior */
+  @media (max-width: 768px) {
+    .env-form-wrapper form {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="env-form-wrapper">
+  <div class="back-button-container">
+    <a href="{% url 'plot_create' %}" class="back-button">↩️ Back</a>
+  </div>
+
+  <h2>Add Environmental Data</h2>
+
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="form-group {% if field.field.widget|slugify == 'textarea' %}full-width{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}
+          <small class="form-text text-muted">{{ field.help_text }}</small>
+        {% endif %}
+        {% for error in field.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-success">💾 Save</button>
+  </form>
+</div>
+{% endblock %}

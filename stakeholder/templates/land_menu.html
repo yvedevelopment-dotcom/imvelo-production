@@ -1,0 +1,53 @@
+{% extends "dash.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  .monitoring-links-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: #f9f9f9;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .monitoring-links-container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+  }
+
+  .monitoring-links-container a {
+    display: block;
+    margin-bottom: 15px;
+    padding: 15px;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    background-color: #2e7d32;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease;
+  }
+
+  .monitoring-links-container a:hover {
+    background-color: #1b5e20;
+  }
+</style>
+
+<div class="monitoring-links-container">
+  <h2>Monitoring Dashboard</h2>
+
+<a href="{% url 'plot_list-m' %}">
+  <i class="fas fa-globe-africa"></i> Land Analysis Info
+</a>
+
+
+  <a href="{% url 'monitoring_record_list-m' %}">
+    📋 Land Monitoring Records
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+
+{% block content %}
+<h1>Planting Event Report: {{ event.name }}</h1>
+<p><strong>Organizer:</strong> {{ event.organizer }}</p>
+<p><strong>Date Planted:</strong> {{ event.date_planted }}</p>
+<p><strong>Location:</strong> {{ event.location }}</p>
+
+{% if plot and plot.latitude and plot.longitude %}
+    <h3>Plot: {{ plot.name }}</h3>
+    <div id="planting-map" style="height: 400px;"></div>
+{% else %}
+    <p>No plot location available.</p>
+{% endif %}
+
+<p><strong>Total Trees Planted:</strong> {{ event.number_of_trees_planted }}</p>
+<p><strong>Number of Species:</strong> {{ total_species }}</p>
+<p><strong>Notes:</strong> {{ event.notes }}</p>
+
+<h2>Event Images</h2>
+<div class="planting-images-container">
+    {% for image in event_images %}
+        <div class="planting-image-item">
+            <img src="{{ image.image.url }}" alt="{{ image.caption }}">
+            <p class="planting-image-description">{{ image.caption }}</p>
+        </div>
+    {% empty %}
+        <p>No images available.</p>
+    {% endfor %}
+</div>
+
+<h2>Planting Details (Species Summary)</h2>
+<table class="planting-species-table" border="1">
+    <tr>
+        <th>Tree Name</th>
+        <th>Scientific Name</th>
+        <th>Quantity Planted</th>
+        <th>IUCN Status</th>
+        <th>Planting Location</th>
+    </tr>
+    {% for detail in planting_details %}
+    <tr>
+        <td>{{ detail.tree.name }}</td>
+        <td>{% if detail.tree.species %}{{ detail.tree.species.scientific_name }}{% endif %}</td>
+        <td>{{ detail.quantity_planted }}</td>
+        <td>{% if detail.tree.species %}{{ detail.tree.species.iucn_status }}{% endif %}</td>
+        <td>{{ event.location }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<style>
+.planting-images-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.planting-image-item {
+    background-color: #f7f7f7;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    text-align: center;
+    width: 200px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.planting-image-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.planting-image-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+.planting-image-description {
+    font-size: 0.9rem;
+    color: #333;
+    padding: 0.5rem;
+}
+.planting-species-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+</style>
+
+{% if plot and plot.latitude and plot.longitude %}
+<!-- Leaflet JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+    var plantingMap = L.map('planting-map').setView([{{ plot.latitude }}, {{ plot.longitude }}], 15);
+
+    // Satellite tiles
+    L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains:['mt0','mt1','mt2','mt3']
+    }).addTo(plantingMap);
+
+    // Plot marker
+    L.marker([{{ plot.latitude }}, {{ plot.longitude }}]).addTo(plantingMap)
+        .bindPopup("{{ plot.name }}")
+        .openPopup();
+</script>
+{% endif %}
+
+{% endblock %}

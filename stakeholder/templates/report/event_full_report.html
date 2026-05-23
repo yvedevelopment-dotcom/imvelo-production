@@ -1,0 +1,10 @@
+{% extends "dash.html" %}
+{% block content %}
+{% if cached_html %}
+    <!-- Cached / historical view -->
+    {{ cached_html|safe }}
+{% else %}
+    <!-- Fresh generation – include the inner content partial -->
+    {% include "report/_event_report_content.html" %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,20 @@
+<div id="cookie-consent-banner" style="position: fixed; bottom: 0; background: #222; color: #fff; width: 100%; padding: 10px; text-align: center; z-index: 9999;">
+    <p>
+        This site uses cookies to improve your experience. By continuing to browse, you accept our use of cookies.
+        <a href="{% url 'cookie_policy' %}" style="color: #00f;">Learn more</a>.
+    </p>
+    <button id="accept-cookies" style="background: #4CAF50; color: #fff; border: none; padding: 10px 20px; cursor: pointer;">
+        Accept
+    </button>
+</div>
+
+<script>
+    document.getElementById('accept-cookies').addEventListener('click', function() {
+        fetch("{% url 'cookie_consent_accept' %}", { method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token }}' } })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('cookie-consent-banner').style.display = 'none';
+                }
+            });
+    });
+</script>

@@ -1,0 +1,215 @@
+{% extends "dash.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+  body {
+    font-family: "Courier New", Courier, monospace;
+  }
+
+  .monitoring-container {
+    max-width: 1080px;
+    margin: 2rem auto;
+    background: #111e11;
+    color: #d0fdd0;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(40, 255, 40, 0.1);
+    border: 2px solid #295e29;
+  }
+
+  .monitoring-container h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #afffaf;
+    border-bottom: 2px solid #295e29;
+    padding-bottom: 0.3rem;
+  }
+
+  .map-and-image {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .plot-map, .first-image img {
+    width: 100%;
+    height: 300px;
+    border-radius: 10px;
+    border: 2px solid #4caf50;
+    object-fit: cover;
+    background: #0f210f;
+  }
+
+  .first-image-caption {
+    text-align: center;
+    font-style: italic;
+    font-size: 0.9rem;
+    color: #a0cfa0;
+    margin-top: 0.4rem;
+  }
+
+  .monitoring-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+  }
+
+  .monitoring-table th,
+  .monitoring-table td {
+    padding: 0.75rem 1rem;
+    border: 1px solid #355d35;
+    text-align: left;
+  }
+
+  .monitoring-table th {
+    background-color: #223822;
+    color: #aef9ae;
+  }
+
+  .monitoring-table tr:nth-child(even) {
+    background-color: #162a16;
+  }
+
+  .monitoring-table tr:hover {
+    background-color: #2f4e2f;
+  }
+
+  .photo-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .photo-card {
+    background: #1c301c;
+    padding: 0.75rem;
+    border: 1px solid #4caf50;
+    border-radius: 8px;
+    text-align: center;
+    color: #cde0cd;
+  }
+
+  .photo-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    color: #90ff90;
+    margin-top: 1rem;
+    text-decoration: none;
+    border-bottom: 1px dashed #4caf50;
+  }
+
+  .back-link:hover {
+    color: #c8ffc8;
+    border-bottom-style: solid;
+  }
+
+  @media (max-width: 768px) {
+    .map-and-image {
+      grid-template-columns: 1fr;
+    }
+
+    .plot-map, .first-image img {
+      height: 220px;
+    }
+  }
+</style>
+
+<div class="monitoring-container">
+  <h2>🛰️ Monitoring Report for {{ record.plot.name }}</h2>
+
+  <div class="map-and-image">
+    <div id="map-1" class="plot-map"></div>
+    {% with first_image=record.plot.images.first %}
+      {% if first_image %}
+      <div class="first-image">
+        <img src="{{ first_image.image.url }}" alt="First Photo">
+        {% if first_image.caption %}
+        <div class="first-image-caption">{{ first_image.caption }}</div>
+        {% endif %}
+      </div>
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var lat = {{ record.plot.latitude|default:"-26.5" }};
+      var lon = {{ record.plot.longitude|default:"31.5" }};
+
+      var map = L.map("map-1").setView([lat, lon], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      {% if record.plot.latitude and record.plot.longitude %}
+      L.marker([{{ record.plot.latitude }}, {{ record.plot.longitude }}]).addTo(map)
+        .bindPopup('<strong>{{ record.plot.name|escapejs }}</strong>');
+      {% endif %}
+
+      {% if record.plot.boundary_coordinates %}
+      var boundaryCoords = {{ record.plot.boundary_coordinates|safe }};
+      var polygon = L.polygon(boundaryCoords, {
+        color: "#2a6fdb",
+        fillColor: "#9ec9ff",
+        fillOpacity: 0.4
+      }).addTo(map);
+      map.fitBounds(polygon.getBounds());
+      {% endif %}
+    });
+  </script>
+
+  <table class="monitoring-table">
+    <tr><th>Monitored At</th><td>{{ record.monitored_at }}</td></tr>
+    <tr><th>Monitored By</th><td>{{ record.monitored_by }}</td></tr>
+    <tr><th>Monitoring Schedule</th><td>{{ record.monitoring_schedule }}</td></tr>
+    <tr><th>Vegetation Cover</th><td>{{ record.vegetation_cover }}</td></tr>
+    <tr><th>Invasive Species Present</th><td>{{ record.invasive_species_present|yesno:"Yes,No" }}</td></tr>
+    <tr><th>Invasive Species Details</th><td>{{ record.invasive_species_details }}</td></tr>
+    <tr><th>Signs of Deforestation</th><td>{{ record.signs_of_deforestation|yesno:"Yes,No" }}</td></tr>
+    <tr><th>Signs of Fire</th><td>{{ record.signs_of_fire|yesno:"Yes,No" }}</td></tr>
+    <tr><th>Illegal Activities Observed</th><td>{{ record.illegal_activities_observed }}</td></tr>
+    <tr><th>Wildlife Presence</th><td>{{ record.wildlife_presence }}</td></tr>
+    <tr><th>Soil Erosion Signs</th><td>{{ record.soil_erosion_signs|yesno:"Yes,No" }}</td></tr>
+    <tr><th>Erosion Notes</th><td>{{ record.erosion_notes }}</td></tr>
+    <tr><th>Water Conditions</th><td>{{ record.water_conditions }}</td></tr>
+    <tr><th>Human Activity Notes</th><td>{{ record.human_activity_notes }}</td></tr>
+    <tr><th>Threats Identified</th><td>{{ record.threats_identified }}</td></tr>
+    <tr><th>Recommended Actions</th><td>{{ record.recommended_actions }}</td></tr>
+    <tr><th>Intervention</th><td>{{ record.intervention }}</td></tr>
+    <tr><th>Weather Conditions</th><td>{{ record.weather_conditions }}</td></tr>
+    <tr><th>Notes</th><td>{{ record.notes }}</td></tr>
+  </table>
+
+  <h3 style="color: #aef9ae; margin-bottom: 1rem;">📷 Additional Photos</h3>
+  {% if record.plot.images.count > 1 %}
+  <div class="photo-gallery">
+    {% for photo in record.plot.images.all %}
+      {% if not forloop.first %}
+      <div class="photo-card">
+        <img src="{{ photo.image.url }}" alt="Photo">
+        <div>{{ photo.caption }}</div>
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% else %}
+    <p style="color: #ccc;">No additional photos available.</p>
+  {% endif %}
+
+  <a href="{% url 'monitoring_record_list-m' %}" class="back-link">← Back to Monitoring List</a>
+</div>
+{% endblock %}

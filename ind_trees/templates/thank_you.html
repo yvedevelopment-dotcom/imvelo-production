@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="thank-you-pagem">
+    <div class="thank-you-boxm">
+        <h1 class="thank-you-titlem">Thank You for Subscribing!</h1>
+        <p class="thank-you-message">You will start receiving our updates shortly.</p>
+        <a href="/" class="thank-you-buttonm">Go Back to Home</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .thank-you-pagem {
+        font-family: Arial, sans-serif;
+        background-color: #e8f0fe;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .thank-you-boxm {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+        padding: 40px;
+        text-align: center;
+        width: 100%;
+        max-width: 450px;
+    }
+
+    .thank-you-titlem {
+        font-size: 26px;
+        margin-bottom: 20px;
+        color: #222222;
+    }
+
+    .thank-you-message {
+        font-size: 18px;
+        margin-bottom: 25px;
+        color: #444444;
+    }
+
+    .thank-you-buttonm {
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        text-decoration: none;
+    }
+
+    .thank-you-buttonm:hover {
+        background-color: #174ea6;
+    }
+</style>
+{% endblock %}

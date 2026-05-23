@@ -1,0 +1,11 @@
+{% extends "dash.html" %}
+
+{% block content %}
+<h1 style="margin-bottom:20px;">Overall AI Environmental & Tree Performance Report: {{ plot.name }}</h1>
+
+<section style="margin-bottom:30px; padding:20px; border:1px solid #ccc; border-radius:10px; background:#eef2f7;">
+    <h2 style="border-bottom:2px solid #888; padding-bottom:5px;">AI-Generated Summary</h2>
+    <pre style="background:#f9f9f9; padding:15px; border-radius:8px; overflow-x:auto; white-space:pre-wrap;">{{ ai_report }}</pre>
+</section>
+
+{% endblock %}

@@ -1,0 +1,147 @@
+{% block content %}
+<h1 class="trend-analysis-title">Tree Event Trend Analysis: {{ event.name }}</h1>
+
+<h2 class="trend-survival-header">Survival Rate Over Time</h2>
+<canvas id="trendSurvivalChart" class="trend-analysis-chart"></canvas>
+
+<h2 class="trend-health-header">Health Status Trends</h2>
+<canvas id="trendHealthChart" class="trend-analysis-chart"></canvas>
+
+<h2 class="trend-threat-header">Threat Occurrence Over Time</h2>
+<canvas id="trendThreatChart" class="trend-analysis-chart"></canvas>
+
+<h2 class="trend-intervention-header">Intervention Effectiveness</h2>
+<canvas id="trendInterventionChart" class="trend-analysis-chart"></canvas>
+
+<h2 class="trend-mortality-header">Mortality vs. Time Since Planting</h2>
+<canvas id="trendMortalityChart" class="trend-analysis-chart"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Parse JSON from Django context
+const trendSpeciesSurvival = JSON.parse('{{ species_survival_json|escapejs }}');
+const trendHealthTrends = JSON.parse('{{ health_trends_json|escapejs }}');
+const trendThreatData = JSON.parse('{{ threat_trends_json|escapejs }}');
+const trendInterventionData = JSON.parse('{{ intervention_data_json|escapejs }}');
+const trendMortalityTrend = JSON.parse('{{ mortality_trend_json|escapejs }}');
+
+// Function to generate distinct HSL color
+function getTrendColor(index, total) {
+    return `hsl(${Math.round((360/total)*index)},70%,50%)`;
+}
+
+// Function to generate gradient fill for a line
+function createTrendGradient(ctx, color) {
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, color.replace('50%', '80%').replace('hsl', 'hsla').replace(')', ',0.4)'));
+    gradient.addColorStop(1, color.replace('50%', '50%').replace('hsl', 'hsla').replace(')', ',0)'));
+    return gradient;
+}
+
+// --- 1️⃣ Survival Chart ---
+const trendSurvivalCtx = document.getElementById('trendSurvivalChart').getContext('2d');
+const trendSurvivalLabels = trendSpeciesSurvival.event_total.map(x => x[0]);
+const trendSurvivalSpecies = Object.keys(trendSpeciesSurvival);
+const trendSurvivalDatasets = trendSurvivalSpecies.map((species, idx) => {
+    const color = getTrendColor(idx, trendSurvivalSpecies.length);
+    return {
+        label: species,
+        data: trendSpeciesSurvival[species].map(x => x[1]),
+        fill: true,
+        backgroundColor: createTrendGradient(trendSurvivalCtx, color),
+        borderColor: color,
+        tension: 0.1
+    };
+});
+new Chart(trendSurvivalCtx, {
+    type: 'line',
+    data: { labels: trendSurvivalLabels, datasets: trendSurvivalDatasets }
+});
+
+// --- 2️⃣ Health Chart ---
+const trendHealthCtx = document.getElementById('trendHealthChart').getContext('2d');
+const trendHealthLabels = [...new Set(Object.values(trendHealthTrends).flat().map(x => x[0]))];
+const trendHealthSpecies = Object.keys(trendHealthTrends);
+const trendHealthDatasets = trendHealthSpecies.map((species, idx) => {
+    const color = getTrendColor(idx, trendHealthSpecies.length);
+    return {
+        label: species,
+        data: trendHealthTrends[species].map(x => x[1]),
+        fill: true,
+        backgroundColor: createTrendGradient(trendHealthCtx, color),
+        borderColor: color,
+        tension: 0.1
+    };
+});
+new Chart(trendHealthCtx, {
+    type: 'line',
+    data: { labels: trendHealthLabels, datasets: trendHealthDatasets }
+});
+
+// --- 3️⃣ Threat Chart ---
+new Chart(document.getElementById('trendThreatChart'), {
+    type: 'bar',
+    data: {
+        labels: Object.keys(trendThreatData),
+        datasets: [{
+            label: 'Threats Frequency',
+            data: Object.values(trendThreatData),
+            backgroundColor: 'rgba(255,99,132,0.6)'
+        }]
+    }
+});
+
+// --- 4️⃣ Intervention Chart ---
+new Chart(document.getElementById('trendInterventionChart'), {
+    type: 'bar',
+    data: {
+        labels: Object.keys(trendInterventionData),
+        datasets: [
+            { label: 'Pre-Intervention Alive', data: Object.values(trendInterventionData).map(x=>x.pre_alive), backgroundColor: 'rgba(54,162,235,0.6)' },
+            { label: 'Post-Intervention Alive', data: Object.values(trendInterventionData).map(x=>x.post_alive), backgroundColor: 'rgba(75,192,192,0.6)' }
+        ]
+    }
+});
+
+// --- 5️⃣ Mortality Chart ---
+new Chart(document.getElementById('trendMortalityChart'), {
+    type: 'line',
+    data: {
+        labels: trendMortalityTrend.map(x => x[0]),
+        datasets: [{
+            label: 'Dead Trees',
+            data: trendMortalityTrend.map(x => x[1]),
+            borderColor: 'rgba(255,99,132,0.7)',
+            fill: false,
+            tension: 0.1
+        }]
+    }
+});
+</script>
+
+<style>
+.trend-analysis-title {
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+.trend-survival-header,
+.trend-health-header,
+.trend-threat-header,
+.trend-intervention-header,
+.trend-mortality-header {
+    color: #34495e;
+    border-bottom: 2px solid #ecf0f1;
+    padding-bottom: 0.5rem;
+    margin-top: 2rem;
+}
+.trend-analysis-chart {
+    margin: 1rem 0;
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+</style>
+
+{% endblock %}

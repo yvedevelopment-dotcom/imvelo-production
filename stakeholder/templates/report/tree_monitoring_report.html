@@ -1,0 +1,43 @@
+{% extends "dash.html" %}
+{% block content %}
+<div class="container">
+  <h2>🌿 Tree Monitoring Report: {{ tree.name }}</h2>
+
+  <h3>🟩 1. Tree Identity & Planting Context</h3>
+  <p><strong>Name:</strong> {{ tree.name }}</p>
+  <p><strong>Species / Variety:</strong> {{ tree.species }}</p>
+  <p><strong>Scientific Name:</strong> {{ tree.scientific_name }}</p>
+
+  {% if first_planting %}
+    <p><strong>Planted By:</strong> {{ first_planting.event.organizer }}</p>
+    <p><strong>Planting Event:</strong> {{ first_planting.event.name }} ({{ first_planting.event.date_planted }})</p>
+    <p><strong>Plot:</strong> {{ first_planting.event.plot.name }}</p>
+    <p><strong>Coordinates:</strong> {{ first_planting.event.plot.latitude }}, {{ first_planting.event.plot.longitude }}</p>
+  {% endif %}
+
+  <h3>🟩 2. Monitoring History Summary</h3>
+  <p><strong>Number of Records:</strong> {{ total_monitorings }}</p>
+  {% if first_monitoring %}
+    <p><strong>First Monitored:</strong> {{ first_monitoring.monitored_at }}</p>
+  {% endif %}
+  {% if latest_monitoring %}
+    <p><strong>Latest Monitoring:</strong> {{ latest_monitoring.monitored_at }}</p>
+    <p><strong>Duration Monitored:</strong> {{ latest_monitoring.monitored_at|date:"Y-m-d" }} - {{ first_monitoring.monitored_at|date:"Y-m-d" }}</p>
+    <p><strong>Estimated Frequency:</strong> Every {{ frequency_days }} days</p>
+  {% endif %}
+
+<h3>🟩 3. Current Tree Status (from Latest Monitoring Per Event)</h3>
+{% if total_monitorings > 0 %}
+  <p><strong>Total Alive Count:</strong> {{ total_alive }}</p>
+  <p><strong>Total Dead Count:</strong> {{ total_dead }}</p>
+
+  <p><strong>Health Status:</strong> {{ latest_monitoring.health_status }}</p>
+  <p><strong>Threats Observed:</strong> {{ latest_monitoring.threats_observed }}</p>
+  <p><strong>Conservation Actions:</strong> {{ latest_monitoring.conservation_actions }}</p>
+  <p><strong>Notes:</strong> {{ latest_monitoring.notes }}</p>
+  <p><strong>Monitored By:</strong> {{ latest_monitoring.monitored_by }}</p>
+  
+{% else %}
+  <p>No monitoring data found yet for this tree.</p>
+{% endif %}
+{% endblock %}

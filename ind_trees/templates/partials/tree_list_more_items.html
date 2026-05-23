@@ -1,0 +1,31 @@
+{% for tree in trees %}
+  <div class="col-md-6 col-lg-4">
+    <div class="card imvelo-tree-card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+      {% if tree.images.first %}
+        <img src="{{ tree.images.first.image.url }}" class="card-img-top" alt="{{ tree.name }}" style="height: 220px; object-fit: cover;">
+      {% else %}
+        <img src="https://via.placeholder.com/400x220?text=No+Image" class="card-img-top" alt="No Image" style="height: 220px; object-fit: cover;">
+      {% endif %}
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title fw-bold text-success">{{ tree.name }}</h5>
+        <p class="card-text text-muted flex-grow-1">{{ tree.tree_description|truncatewords:15 }}</p>
+        <a href="{% url 'tree_detail' tree.pk %}" class="btn btn-outline-success rounded-pill mt-2 align-self-start">View Details <i class="bi bi-arrow-right-short"></i></a>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+
+<!-- OOB swap to update the load more button -->
+<div id="load-more-container" hx-swap-oob="true">
+  {% if trees.has_next %}
+    <button class="btn btn-outline-success btn-lg rounded-pill px-5"
+            hx-get="{% url 'tree_list' %}?page={{ trees.next_page_number }}&q={{ request.GET.q }}"
+            hx-target="#tree-cards"
+            hx-swap="beforeend"
+            hx-indicator="#load-spinner"
+            id="load-more-btn">
+      <span id="load-spinner" class="htmx-indicator spinner-border spinner-border-sm me-2" role="status"></span>
+      Load More Trees
+    </button>
+  {% endif %}
+</div>

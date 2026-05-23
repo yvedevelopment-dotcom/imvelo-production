@@ -1,0 +1,154 @@
+{% extends 'dash.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  body {
+    font-family: "Courier New", Courier, monospace;
+  }
+
+  .monitoring-container {
+    padding: 1.5rem;
+    background-color: #111e11;
+    border: 2px solid #294229;
+    border-radius: 8px;
+    color: #cde0cd;
+    max-width: 1100px;
+    margin: auto;
+    box-shadow: 0 0 8px rgba(50, 150, 50, 0.3);
+  }
+
+  .monitoring-container h2 {
+    font-size: 1.4rem;
+    color: #9eff9e;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #294229;
+    padding-bottom: 0.4rem;
+  }
+
+  .search-box {
+    margin-bottom: 1rem;
+  }
+
+  .search-box input {
+    padding: 0.4rem 0.6rem;
+    width: 100%;
+    max-width: 400px;
+    border: 2px solid #4caf50;
+    border-radius: 5px;
+    background: #1a2a1a;
+    color: #d2ffd2;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+  }
+
+  table th, table td {
+    padding: 0.6rem;
+    border: 1px solid #355d35;
+    text-align: left;
+  }
+
+  table th {
+    background-color: #223822;
+    color: #aef9ae;
+  }
+
+  table tr:nth-child(even) {
+    background-color: #182a18;
+  }
+
+  table tr:hover {
+    background-color: #2e4e2e;
+  }
+
+  img {
+    max-height: 100px;
+    border: 1px solid #4caf50;
+    border-radius: 4px;
+  }
+
+  .pagination {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+  }
+
+  .pagination a {
+    padding: 0.3rem 0.7rem;
+    background-color: #294229;
+    color: #b4ffb4;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 1px solid #4caf50;
+  }
+
+  .pagination a:hover {
+    background-color: #3a5f3a;
+  }
+
+  .pagination span {
+    color: #cde0cd;
+  }
+</style>
+
+<div class="monitoring-container">
+  <h2>🛰️ Monitored Land Plots</h2>
+
+  <form method="get" class="search-box">
+    <input type="text" name="q" placeholder="Search by plot name..." value="{{ request.GET.q }}">
+  </form>
+<a href="{% url 'monitoring_wizard' %}" class="btn btn-primary mb-3">Add New Monitoring Record</a>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Plot Name</th>
+        <th>Monitored At</th>
+        <th>Photo</th>
+        <th>Details</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for record in records %}
+      <tr>
+        <td>{{ record.plot.name }}</td>
+        <td>{{ record.monitored_at|date:"Y-m-d H:i" }}</td>
+        <td>
+          {% if record.photos.first %}
+            <img src="{{ record.photos.first.image.url }}" alt="Monitoring Photo">
+          {% else %}
+            <em>No photo</em>
+          {% endif %}
+        </td>
+        <td>
+          <a href="{% url 'monitoring_record_detail-m' record.pk %}">🔎 View</a>
+        </td>
+      </tr>
+      {% empty %}
+        <tr><td colspan="4"><em>No records found.</em></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if is_paginated %}
+    <div class="pagination">
+      {% if page_obj.has_previous %}
+        <a href="?q={{ request.GET.q }}&page={{ page_obj.previous_page_number }}">← Previous</a>
+      {% endif %}
+
+      <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+      {% if page_obj.has_next %}
+        <a href="?q={{ request.GET.q }}&page={{ page_obj.next_page_number }}">Next →</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

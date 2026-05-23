@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>All Land</h2>
+<ul>
+    {% for plot in plots %}
+        <li>
+            <a href="{% url 'plot_detail' plot.pk %}">{{ plot.name }}</a>
+        </li>
+    {% empty %}
+        <li>No plots available.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,59 @@
+
+
+
+{% block content %}
+<h1>Monitoring Summary for Event: {{ event.name }}</h1>
+
+<h2>Linked Monitoring Summary</h2>
+<p><strong>Number of Monitoring Records:</strong> {{ num_monitoring_records }}</p>
+<p><strong>First Monitoring Date:</strong> {{ first_monitoring_date }}</p>
+<p><strong>Latest Monitoring Date:</strong> {{ latest_monitoring_date }}</p>
+<p><strong>Average Monitoring Frequency (days):</strong> {{ avg_monitoring_frequency }}</p>
+<p><strong>Total Alive Trees:</strong> {{ total_alive }}</p>
+<p><strong>Total Dead Trees:</strong> {{ total_dead }}</p>
+<p><strong>Most Common Health Status:</strong> {{ most_common_health_status }}</p>
+<p><strong>Most Frequent Threats:</strong> {{ most_frequent_threats }}</p>
+<p><strong>Most Common Conservation Actions:</strong> {{ most_common_conservation_actions }}</p>
+
+<h2>Per-Species Performance</h2>
+<table class="monitoring-species-table" border="1">
+    <tr>
+        <th>Species</th>
+        <th>Qty Planted</th>
+        <th>Alive (Latest)</th>
+        <th>Dead (Latest)</th>
+        <th>% Survival</th>
+        <th>Most Recent Health Status</th>
+        <th>Interventions Taken</th>
+    </tr>
+    {% for sp in species_performance %}
+    <tr>
+        <td>{{ sp.species }}</td>
+        <td>{{ sp.qty_planted }}</td>
+        <td>{{ sp.alive_latest }}</td>
+        <td>{{ sp.dead_latest }}</td>
+        <td>{{ sp.survival_pct }}%</td>
+        <td>{{ sp.recent_health_status }}</td>
+        <td>{{ sp.interventions_taken }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<style>
+.monitoring-species-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+.monitoring-species-table th {
+    background-color: #f5f5f5;
+    padding: 0.5rem;
+    text-align: left;
+}
+.monitoring-species-table td {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,222 @@
+{% extends "dash.html" %}
+{% load static %}
+
+{% block extra_head %}
+  <!-- Fonts and Select2 Styles -->
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+
+  <style>
+    /* Your tree page styles */
+    .treepage-content-section {
+      padding: 30px;
+      background-color: #1c2b1c;
+      border-radius: 8px;
+      margin-top: 20px;
+      position: relative;
+      z-index: 1;
+      color: #e6ffe6;
+      font-family: 'Segoe UI', sans-serif;
+      border: 2px solid #365339;
+      box-shadow: inset 0 0 8px #0f1c0f;
+    }
+
+    .treepage-actions {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .treepage-button {
+      padding: 10px 18px;
+      background-color: #2e4734;
+      color: #ffffff;
+      border: 1px solid #456d52;
+      text-decoration: none;
+      font-weight: 700;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .treepage-button.treepage-add {
+      background-color: #406b44;
+    }
+
+    .treepage-button.treepage-secondary {
+      background-color: #5c7c65;
+    }
+
+    .treepage-button:hover {
+      background-color: #355c3e;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .treepage-search-bar {
+      margin-bottom: 25px;
+    }
+
+    .treepage-search-bar input {
+      padding: 10px 14px;
+      width: 70%;
+      max-width: 420px;
+      background-color: #e9edea;
+      border: 2px solid #334d39;
+      border-radius: 4px;
+      font-size: 15px;
+      color: #1b2d1e;
+    }
+
+    .treepage-search-bar button {
+      padding: 10px 18px;
+      margin-left: 10px;
+      background-color: #1a2c1f;
+      color: #dfffe0;
+      border: 2px solid #456d52;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .treepage-search-bar button:hover {
+      background-color: #243e29;
+    }
+
+    .treepage-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .treepage-item {
+      background-color: #2a3d2d;
+      margin-bottom: 12px;
+      padding: 15px 20px;
+      border-left: 6px solid #5faa66;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      transition: background 0.3s ease;
+    }
+
+    .treepage-item:hover {
+      background-color: #35513b;
+    }
+
+    .treepage-item h2 {
+      font-size: 18px;
+      margin: 0;
+      color: #d9ffd9;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .treepage-item a {
+      color: #adffbc;
+      text-decoration: none;
+    }
+
+    .treepage-item a:hover {
+      text-decoration: underline;
+    }
+
+    .treepage-no-results {
+      text-align: center;
+      font-style: italic;
+      color: #aaa;
+      border: 1px dashed #666;
+      padding: 12px;
+    }
+
+    .treepage-pagination {
+      margin-top: 25px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .treepage-pagination-button {
+      padding: 10px 16px;
+      background-color: #1f331f;
+      color: #cde3c8;
+      border: 1px solid #365339;
+      border-radius: 4px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .treepage-pagination-button:hover {
+      background-color: #2d4634;
+    }
+
+    @media (max-width: 768px) {
+      .treepage-search-bar input {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+
+      .treepage-search-bar form {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .treepage-actions {
+        flex-direction: column;
+      }
+
+      .treepage-button {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<section class="treepage-content-section">
+  <div class="treepage-actions">
+    <a href="{% url 'tree_list-m' %}" class="treepage-button treepage-back-button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 1-.5.5H2.707l4.147 4.146a.5.5 0 0 1-.708.708l-5-5a.5.5 0 0 1 0-.708l5-5a.5.5 0 1 1 .708.708L2.707 7.5H14.5A.5.5 0 0 1 15 8z"/>
+      </svg>
+      Back
+    </a>
+    <a href="{% url 'tree_create-m' %}" class="treepage-button treepage-add">➕ Add Tree</a>
+    <a href="#" class="treepage-button treepage-secondary">📄 Upload Tree PDF</a>
+  </div>
+
+  <div class="treepage-search-bar">
+    <form method="get">
+      <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search trees by name, code or category..." />
+      <button type="submit">🔍 Search</button>
+    </form>
+  </div>
+
+  <div class="treepage-list">
+    {% for tree in trees %}
+      <div class="treepage-item">
+        <div class="treepage-info">
+          <h6><a href="{% url 'tree_detail-m' tree.pk %}">{{ tree.name }}</a></h6>
+        </div>
+      </div>
+    {% empty %}
+      <div class="treepage-item treepage-no-results">
+        ⚠️ No trees found in this operation.
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="treepage-pagination">
+    {% if trees.has_previous %}
+      <a href="?page={{ trees.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="treepage-pagination-button">⬅ Prev</a>
+    {% endif %}
+    {% if trees.has_next %}
+      <a href="?page={{ trees.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="treepage-pagination-button">Next ➡</a>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

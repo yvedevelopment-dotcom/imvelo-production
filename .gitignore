@@ -1,0 +1,84 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment
+myvenv/
+.env
+*.env
+
+env/
+venv/
+
+# Django
+db.sqlite3
+
+# PyTest
+.pytest_cache/
+
+# general
+*~
+*.swp
+*.
+
+# byte-compiled / optimized / DLL files
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# distributions
+*.egg-info
+*.egg
+
+# docker
+docker-compose*.yml
+
+# Jupyter
+.jet
+.ipynb_checkpoints/
+
+# mypy
+.mypy_cache/
+
+# Environments
+.pyvenv
+
+# Coverage reports
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.tox/
+
+# celery beat schedule file
+celerybeat-schedule
+
+# Sphinx documentation
+/docs/_build
+
+# PyBuilder
+/.pybuilder
+
+target/*
+
+# local history
+.localhistory
+
+# dotenv
+.env
+
+# Intellij project files
+.idea
+
+# IDEs
+.vscode/
+__pycache__/
+*.pyc
+*.json   # if you don't want any JSON files tracked (be careful if you need other JSONs)
+# OR specifically:
+my-earth-engine-project-*.json

@@ -1,0 +1,22 @@
+{% extends "dash.html" %}
+{% load static %}
+
+{% block extra_head %}
+  <!-- Leaflet CSS/JS (if maps are in the cached content) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Chart.js (if charts are used) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Bootstrap JS (already in dash.html probably) -->
+{% endblock %}
+
+{% block content %}
+<h1>Event Report: {{ event.name }}</h1>
+<p><em>{% if report %}Historical report generated on {{ report.created_at|date:"Y-m-d H:i" }}{% else %}Latest snapshot{% endif %}</em></p>
+
+<!-- The full inner content (tabs, charts, maps) is rendered here -->
+<div id="report-wrapper">
+    {{ cached_html|safe }}
+</div>
+
+{% endblock %}

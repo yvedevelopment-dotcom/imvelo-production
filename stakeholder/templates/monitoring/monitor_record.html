@@ -1,0 +1,204 @@
+{% extends "dash.html" %}
+{% load static %}
+{% block content %}
+
+<!-- 💡 Compact Military Green Theme + Image Grid + Back Button -->
+<style>
+  body {
+    background-color: #0f1a0f;
+    color: #d0f0d0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .monitoring-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: #142414;
+    border: 1px solid #264026;
+    border-radius: 8px;
+    box-shadow: 0 0 12px rgba(50, 255, 100, 0.15);
+  }
+
+  .monitoring-container h2,
+  .monitoring-container h3,
+  .monitoring-container legend {
+    color: #98ff98;
+    border-bottom: 1px solid #334d33;
+    padding-bottom: 0.3rem;
+    margin-top: 1.2rem;
+    font-size: 1.2rem;
+  }
+
+  .form-group {
+    margin-bottom: 0.8rem;
+  }
+
+  label {
+    display: block;
+    color: #b5ffb5;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 0.4rem 0.6rem;
+    background-color: #1c2d1c;
+    border: 1px solid #3c5e3c;
+    color: #e0ffe0;
+    border-radius: 4px;
+    font-size: 0.95rem;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: #64ff64;
+    outline: none;
+    background-color: #223322;
+  }
+
+  .btn-primary {
+    background-color: #2f5f2f;
+    border: none;
+    padding: 0.5rem 1rem;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    font-size: 0.95rem;
+  }
+
+  .btn-primary:hover {
+    background-color: #3f7f3f;
+  }
+
+  .btn-back {
+    display: inline-block;
+    margin-bottom: 1rem;
+    background-color: #1c3f1c;
+    color: #98ff98;
+    border: 1px solid #355f35;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s ease;
+    font-size: 0.9rem;
+  }
+
+  .btn-back:hover {
+    background-color: #3a5f3a;
+    color: #ffffff;
+  }
+
+  .tree-row,
+  .photo-row {
+    background-color: #1a2a1a;
+    border: 1px solid #3d5d3d;
+    border-radius: 6px;
+    padding: 0.8rem;
+    margin-bottom: 1.2rem;
+  }
+
+  hr {
+    border-color: #355535;
+  }
+
+  small.form-text.text-muted {
+    color: #7fbf7f;
+    font-size: 0.85rem;
+  }
+
+  /* ✅ Photo upload grid */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 600px) {
+    .photo-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .photo-grid .photo-row {
+    margin-bottom: 0;
+  }
+</style>
+
+<div class="monitoring-container">
+  <!-- 🔙 Back to Event Selection -->
+   <a href="{% url 'monitoring_back_clear' %}" class="btn-back">← Back to Event Selection</a>
+
+
+  <h2>Monitoring for: {{ event.name }} ({{ event.date_planted }})</h2>
+  {% if event.plot %}
+    <p><strong>Plot:</strong> {{ event.plot.name }}</p>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <fieldset>
+      <legend>Main Monitoring Record</legend>
+      {% for field in form.visible_fields %}
+        <div class="form-group">
+          {{ field.label_tag }} {{ field }}
+          {% if field.help_text %}
+            <small class="form-text text-muted">{{ field.help_text }}</small>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </fieldset>
+
+    <hr>
+
+    <h3>Monitored Trees Details</h3>
+    {{ tree_formset.management_form }}
+    {% for tf in tree_formset.forms %}
+      <div class="tree-row">
+        {{ tf.non_field_errors }}
+        {% for field in tf.visible_fields %}
+          <div class="form-group">
+            {{ field.label_tag }} {{ field }}
+            {% if field.help_text %}
+              <small class="form-text text-muted">{{ field.help_text }}</small>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% empty %}
+      <p>No trees found for this event.</p>
+    {% endfor %}
+
+    <hr>
+
+    <h3>Upload Photos</h3>
+    {{ photo_formset.management_form }}
+    <div class="photo-grid">
+      {% for pf in photo_formset.forms %}
+        <div class="photo-row">
+          {% for field in pf.visible_fields %}
+            <div class="form-group">
+              {{ field.label_tag }} {{ field }}
+              {% if field.help_text %}
+                <small class="form-text text-muted">{{ field.help_text }}</small>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+
+    <hr>
+    <button type="submit" class="btn-primary">Save Monitoring Record</button>
+  </form>
+</div>
+
+{% endblock %}

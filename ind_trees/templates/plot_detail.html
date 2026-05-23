@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Hero -->
+<section class="imvelo-plot-hero text-white text-center d-flex align-items-center" style="background: linear-gradient(135deg, #2d6a4f, #1b4632); min-height: 30vh;">
+  <div class="container">
+    <h1 class="display-4 fw-bold animate__animated animate__fadeInDown">{{ plot.name }}</h1>
+    <p class="lead mt-3 animate__animated animate__fadeInUp">{{ plot.location }}</p>
+  </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-5" style="background-color: #f8f9fa;">
+  <div class="container">
+
+    <!-- Core Info Card -->
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+      <div class="row g-4">
+        <div class="col-md-6">
+          <h5 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-rulers me-2"></i>Land Details</h5>
+          <p class="mb-2"><strong>Area:</strong> {{ plot.area_hectares }} ha</p>
+          <p class="mb-2"><strong>Location:</strong> {{ plot.location }}</p>
+          <p class="mb-2"><strong>Ownership:</strong> {{ plot.get_land_ownership_display }}</p>
+        </div>
+        <div class="col-md-6">
+          <h5 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-shield-check me-2"></i>Status & Zone</h5>
+          <p class="mb-2"><strong>Protection Status:</strong> {{ plot.get_protection_status_display }}</p>
+          <p class="mb-2"><strong>Zone Type:</strong> {{ plot.get_zone_type_display }}</p>
+          {% if plot.latitude and plot.longitude %}
+            <p class="mb-2"><strong>Coordinates:</strong> {{ plot.latitude }}, {{ plot.longitude }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Map Card -->
+    {% if plot.latitude and plot.longitude %}
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4">
+      <div id="plot-map" style="height: 350px;"></div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var map = L.map('plot-map', {
+          scrollWheelZoom: false,  // prevents accidental zoom when scrolling the page
+          zoomControl: true
+        }).setView([{{ plot.latitude }}, {{ plot.longitude }}], 16);
+
+        // Satellite tiles (Esri World Imagery)
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          attribution: '&copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community',
+          maxZoom: 20
+        }).addTo(map);
+
+        L.marker([{{ plot.latitude }}, {{ plot.longitude }}]).addTo(map)
+          .bindPopup('<strong>{{ plot.name|escapejs }}</strong>');
+
+        {% if plot.boundary_coordinates %}
+        var boundaryCoords = {{ plot.boundary_coordinates|safe }};
+        var polygon = L.polygon(boundaryCoords, {
+          color: "#2d6a4f",
+          fillColor: "#6fbf8b",
+          fillOpacity: 0.35,
+          weight: 2
+        }).addTo(map);
+        map.fitBounds(polygon.getBounds().pad(0.1));  // slight padding
+        {% endif %}
+      });
+    </script>
+    {% else %}
+    <div class="text-center py-4 bg-white rounded-4 shadow-sm mb-4">
+      <i class="bi bi-map" style="font-size: 2rem; color: #2d6a4f;"></i>
+      <p class="mt-2 text-muted">No coordinates available for map display.</p>
+    </div>
+    {% endif %}
+
+    <!-- Photo Gallery -->
+    {% if plot.images.all %}
+    <div class="mb-4">
+      <h3 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-images me-2"></i>Plot Photos</h3>
+      <div class="row g-3">
+        {% for image in plot.images.all %}
+          <div class="col-md-4 col-6">
+            <div class="card border-0 rounded-4 overflow-hidden shadow-sm">
+              <img src="{{ image.image.url }}" alt="{{ image.caption }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+              {% if image.caption %}
+                <div class="card-body py-2 text-center">
+                  <small class="text-muted fst-italic">{{ image.caption }}</small>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Environmental Data Card -->
+    {% if plot.land_data %}
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+      <h3 class="fw-bold mb-3" style="color: #2d6a4f;"><i class="bi bi-bar-chart-steps me-2"></i>Environmental Data</h3>
+      <div class="row">
+        <div class="col-md-6">
+          <ul class="list-unstyled">
+            <li class="mb-2"><strong>Soil Type:</strong> {{ plot.land_data.soil_type }}</li>
+            <li class="mb-2"><strong>Soil pH:</strong> {{ plot.land_data.soil_pH }}</li>
+            <li class="mb-2"><strong>Fertility Level:</strong> {{ plot.land_data.fertility_level }}</li>
+            <li class="mb-2"><strong>Rainfall (mm):</strong> {{ plot.land_data.rainfall_mm }}</li>
+          </ul>
+        </div>
+        <div class="col-md-6">
+          <ul class="list-unstyled">
+            <li class="mb-2"><strong>Temperature (°C):</strong> {{ plot.land_data.temperature_c }}</li>
+            <li class="mb-2"><strong>Water Source:</strong> {{ plot.land_data.water_source_proximity }}</li>
+            <li class="mb-2"><strong>Biodiversity Notes:</strong> {{ plot.land_data.biodiversity_notes|default:"N/A" }}</li>
+            <li class="mb-2"><strong>Recorded On:</strong> {{ plot.land_data.recorded_on }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="text-center py-4 bg-white rounded-4 shadow-sm mb-4">
+      <i class="bi bi-exclamation-circle text-muted" style="font-size: 2rem;"></i>
+      <p class="mt-2 text-muted">No environmental data available for this land.</p>
+    </div>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="text-center mt-4">
+      <a href="{% url 'plot_list' %}" class="btn btn-outline-success btn-lg rounded-pill px-5">
+        <i class="bi bi-arrow-left me-2"></i>Back to All Lands
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- Scoped style -->
+<style>
+  .imvelo-plot-hero {
+    box-shadow: inset 0 0 0 1000px rgba(0,0,0,0.2);
+  }
+  #plot-map {
+    border-radius: 0 0 0.375rem 0.375rem;
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends "dash.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  body {
+    font-family: "Segoe UI", Roboto, sans-serif;
+    background-color: #0f1f0f;
+    color: #e0f0e0;
+    font-size: 0.9rem;
+  }
+
+  .monitoring-container {
+    max-width: 850px;
+    margin: 2rem auto;
+    padding: 1rem 1.5rem;
+    background-color: #1b2d1b;
+    border: 2px solid #2e4a2e;
+    border-radius: 10px;
+    box-shadow: 0 0 15px #0a160a;
+  }
+
+  .monitoring-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #355335;
+    padding-bottom: 0.4rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .monitoring-header h1 {
+    font-size: 1.3rem;
+    color: #aaffaa;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .monitoring-header form {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .monitoring-header input[type="text"] {
+    background-color: #0f1f0f;
+    border: 1px solid #355335;
+    color: #aaffaa;
+    padding: 0.3rem 0.5rem;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    width: 180px;
+  }
+
+  .monitoring-header button {
+    background-color: #234d23;
+    color: #aaffaa;
+    padding: 0.3rem 0.6rem;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .monitoring-header button:hover {
+    background-color: #2f6e2f;
+  }
+
+  .monitoring-header a {
+    text-decoration: none;
+    background-color: #234d23;
+    color: #aaffaa;
+    padding: 0.3rem 0.7rem;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    transition: background 0.3s ease;
+  }
+
+  .monitoring-header a:hover {
+    background-color: #2f6e2f;
+  }
+
+  .schedule-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 1rem;
+  }
+
+  .schedule-item {
+    background-color: #253f25;
+    margin-bottom: 0.6rem;
+    padding: 0.6rem 0.8rem;
+    border-left: 4px solid #88cc88;
+    border-radius: 4px;
+    box-shadow: inset 0 0 4px #0c1a0c;
+    font-size: 0.85rem;
+  }
+
+  .schedule-item strong {
+    color: #d0ffd0;
+  }
+
+  .empty-message {
+    color: #889f88;
+    font-style: italic;
+  }
+</style>
+
+<div class="monitoring-container">
+  <div class="monitoring-header">
+    <h1>Monitoring Schedules</h1>
+
+    <form method="get">
+      <input
+        type="text"
+        name="q"
+        value="{{ query }}"
+        placeholder="Search plot or assignee"
+      />
+      <button type="submit">🔍 Search</button>
+    </form>
+
+    <a href="{% url 'monitoring_schedule_create-m' %}">➕ New</a>
+  </div>
+
+  <ul class="schedule-list">
+    {% for schedule in schedules %}
+      <li class="schedule-item">
+        <strong>{{ schedule.plot.name }}</strong> — every 
+        <span style="color: #9fdf9f;">{{ schedule.frequency_days }}</span> days —
+        Next Due: <span style="color: #b3ffb3;">{{ schedule.next_due }}</span> —
+        Assigned: <span style="color: #88cc88;">{{ schedule.assigned_to }}</span>
+      </li>
+    {% empty %}
+      <li class="schedule-item empty-message">
+        ⚠️ No monitoring schedules yet.
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

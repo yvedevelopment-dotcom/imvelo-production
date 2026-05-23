@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ heritage_site.name }}</title>
+    <style>
+        /* General Body Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* Main Container */
+        .heritage-site-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* Heading Styles */
+        .heritage-site-heading {
+            text-align: center;
+            font-size: 2em;
+            color: #2b7a77;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .heritage-site-description {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        /* Location Info */
+        .heritage-site-location {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        /* Featured Image */
+        .featured-image {
+            width: 100%;
+            max-width: 150px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            object-fit: cover;
+        }
+
+        /* Trees List */
+        .trees-list {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 40px;
+        }
+
+        .tree-item {
+            margin-bottom: 15px;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .tree-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .tree-item a {
+            text-decoration: none;
+            color: #2b7a77;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .tree-item a:hover {
+            color: #4CAF50;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .heritage-site-heading {
+                font-size: 1.5em;
+            }
+
+            .heritage-site-description,
+            .heritage-site-location {
+                font-size: 1em;
+            }
+
+            .tree-item {
+                padding: 8px;
+            }
+
+            .tree-item a {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="heritage-site-container">
+        <h1 class="heritage-site-heading">{{ heritage_site.name }}</h1>
+
+        <p class="heritage-site-description">{{ heritage_site.description }}</p>
+
+        <p class="heritage-site-location"><strong>Location:</strong> {{ heritage_site.location }}</p>
+
+        {% if heritage_site.featured_image %}
+            <img src="{{ heritage_site.featured_image.url }}" alt="{{ heritage_site.name }}" class="featured-image">
+        {% endif %}
+
+        <h2 class="trees-heading">Trees at this Heritage Site</h2>
+        <ul class="trees-list">
+            {% for tree in trees %}
+                <li class="tree-item">
+                    <a href="{% url 'tree_detail' tree.id %}">{{ tree.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</body>
+</html>
+{% endblock %}

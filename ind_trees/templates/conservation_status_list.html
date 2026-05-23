@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conservation Status List</title>
+    <style>
+        /* Page Body Styling */
+        .conservation-status-page {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        /* Header Styling */
+        .header-section {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Main Container */
+        .main-container {
+            width: 80%;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Conservation Status List Styling */
+        .status-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .status-list-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .status-list-item a {
+            text-decoration: none;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .status-list-item a:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer Styling */
+        .footer-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body class="conservation-status-page">
+
+<header class="header-section">
+    <h1 class="header-title">Conservation Statuses</h1>
+</header>
+
+<div class="main-container">
+    <ul class="status-list">
+        {% for status in statuses %}
+            <li class="status-list-item">
+                <a href="{% url 'trees_by_conservation_status' pk=status.pk %}" class="status-link">{{ status }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="footer-section">
+    <p>Questions or Assistance? Please reach out to our support team at <a href="mailto:support@temvelo.art">support@temvelo.art</a>.</p>
+</div>
+
+</body>
+</html>
+{% endblock %}

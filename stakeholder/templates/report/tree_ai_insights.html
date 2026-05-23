@@ -1,0 +1,13 @@
+{% extends "dash.html" %}
+{% block content %}
+<div class="container" style="font-family: 'Segoe UI', sans-serif; font-size: 14px; padding: 1rem;">
+  <h2>🌿 AI Insights for Tree: <strong>{{ object.name }}</strong></h2>
+  <p><strong>Region:</strong> {{ region_info }}</p>
+
+  <div style="background-color: #f8f8f8; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
+    {% for line in ai_cleaned_lines %}
+      <p style="margin-bottom: 0.5em;">{{ line }}</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

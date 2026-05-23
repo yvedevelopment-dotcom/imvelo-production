@@ -1,0 +1,409 @@
+{% extends 'dash.html' %}
+{% block content %}
+
+<style>
+    /* Reset and base */
+    body {
+        font-family: 'Consolas', 'Courier New', monospace;
+        background-color: #f5f5f5; /* very light neutral background */
+        color: #333333; /* dark grey text for readability */
+        line-height: 1.3;
+        margin: 0;
+        padding: 0;
+        user-select: none;
+    }
+
+    .container {
+        max-width: 960px;
+        margin: 20px auto;
+        padding: 15px 20px;
+        background-color: #83947f; /* clean white background */
+        border: 3px solid #cccccc; /* soft light grey border */
+        box-shadow: 0 0 15px 2px #e0e0e0 inset; /* subtle inset shadow */
+        border-radius: 4px;
+    }
+
+    /* Headers */
+    h1.h1-tree {
+        font-size: 1.8em;
+        color: #2a2a2a; /* dark charcoal text */
+        text-align: center;
+        margin-bottom: 15px;
+        font-weight: 900;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        user-select: text;
+    }
+
+    h3.h3-tree {
+        font-size: 1.2em;
+        color: #555555; /* medium grey */
+        margin: 25px 0 10px 0;
+        font-weight: 700;
+        border-bottom: 2px solid #bbbbbb; /* light grey */
+        padding-bottom: 4px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    p, .p-tree {
+        font-size: 0.85em;
+        color: #555555;
+        margin: 6px 0;
+        line-height: 1.4;
+        user-select: text;
+    }
+
+    /* Image gallery grid, compact */
+    .image-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .image-gallery img {
+        width: 100%;
+        height: 120px;
+        border-radius: 0;
+        object-fit: cover;
+        box-shadow: 0 0 3px #bbb; /* subtle grey shadow */
+        border: 1px solid #ccc; /* light grey border */
+        transition: none;
+    }
+
+    .image-gallery p {
+        text-align: center;
+        font-style: normal;
+        font-weight: 600;
+        color: #666666; /* medium grey */
+        margin-top: 4px;
+        font-size: 0.75em;
+        user-select: text;
+    }
+
+    /* Categories list, strong font */
+    .categories ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    .categories li {
+        font-size: 0.95em;
+        font-weight: 700;
+        color: #444444; /* dark grey */
+        padding: 2px 0;
+        border-bottom: 1px solid #ddd; /* very light grey */
+        user-select: text;
+    }
+
+    /* Sections with strong borders */
+    .tree-section {
+        background-color: #fafafa; /* very light grey background */
+        border: 2px solid #ddd; /* soft light grey border */
+        border-radius: 0;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        box-shadow: none;
+    }
+
+    .tree-section p {
+        font-size: 0.9em;
+        color: #444444;
+        line-height: 1.4;
+        font-weight: 600;
+    }
+
+    /* QR Code container */
+    .qr-code-container {
+        text-align: center;
+        background: #fff; /* white background */
+        padding: 15px 10px;
+        border: 2px solid #aaa; /* medium grey border */
+        border-radius: 0;
+        box-shadow: 0 0 8px #ddd inset; /* light grey inset glow */
+        margin: 20px auto 30px;
+        max-width: 360px;
+        user-select: none;
+    }
+
+    .qr-code-container h3 {
+        font-size: 1em;
+        color: #666666; /* medium grey */
+        margin-bottom: 10px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
+
+    .qr-code {
+        width: 160px;
+        height: 160px;
+        border: 3px solid #999; /* medium grey border */
+        padding: 6px;
+        background: #fefefe;
+        display: inline-block;
+        margin-bottom: 12px;
+    }
+
+    /* Buttons - block, subtle blue */
+    .qr-code-container button {
+        display: block;
+        width: 85%;
+        margin: 8px auto;
+        padding: 10px 0;
+        font-size: 0.9em;
+        font-weight: 900;
+        color: #fff;
+        background-color: #007acc; /* calm blue */
+        border: 2px solid #005a99; /* darker blue */
+        border-radius: 0;
+        cursor: pointer;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        transition: background-color 0.15s ease;
+        user-select: none;
+    }
+
+    .qr-code-container button:hover {
+        background-color: #0099ff; /* brighter blue */
+    }
+
+    .qr-code-container button:active {
+        background-color: #004d80; /* darker blue */
+    }
+
+    /* Back Button */
+    .back-button {
+        display: inline-block;
+        background-color: #007acc; /* calm blue */
+        color: #eee;
+        padding: 10px 24px;
+        border-radius: 0;
+        text-decoration: none;
+        margin-top: 25px;
+        text-align: center;
+        font-size: 0.95em;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        border: 2px solid #005a99; /* darker blue */
+        user-select: none;
+        transition: background-color 0.2s ease;
+    }
+
+    .back-button:hover {
+        background-color: #0099ff; /* brighter blue */
+    }
+
+    .back-button:active {
+        background-color: #004d80; /* darker blue */
+        transform: scale(0.97);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        h1.h1-tree {
+            font-size: 1.5em;
+            margin-bottom: 12px;
+        }
+
+        h3.h3-tree {
+            font-size: 1em;
+            margin: 20px 0 8px 0;
+        }
+
+        .tree-section {
+            padding: 12px 15px;
+        }
+
+        .image-gallery {
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        }
+
+        .image-gallery img {
+            height: 100px;
+        }
+
+        .qr-code-container {
+            max-width: 280px;
+            padding: 12px 8px;
+        }
+
+        .qr-code {
+            width: 140px;
+            height: 140px;
+        }
+    }
+</style>
+
+
+<div class="container">
+    <h1 class="h1-tree">{{ tree.name }}</h1>
+
+    <!-- QR Code Section -->
+    <div class="qr-code-container">
+        <h3>SCAN TO VIEW</h3>
+        <img src="{% url 'tree_qr' tree.id %}" id="qr-image" alt="QR Code for {{ tree.name }}" class="qr-code">
+
+        <button onclick="downloadQRCode('png')">DOWNLOAD PNG</button>
+        <button onclick="downloadQRCode('pdf')">DOWNLOAD PDF</button>
+        <button onclick="shareQRCode()">SHARE QR CODE</button>
+    </div>
+
+    <!-- Tree Images -->
+    <div class="image-gallery">
+        {% for image in tree_images %}
+            <div>
+                <img src="{{ image.image.url }}" alt="Image for {{ tree.name }}">
+                <p>{{ image.caption }}</p>
+            </div>
+        {% empty %}
+            <p>No images available.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Categories -->
+    <div class="categories">
+        <h3>CATEGORIES</h3>
+        <ul>
+            {% for category in tree.categories.all %}
+                <li>{{ category.name }}</li>
+            {% empty %}
+                <li>No categories assigned.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Tree Info -->
+    <div class="tree-section">
+        <p><strong>DESCRIPTION:</strong> {{ tree.tree_description }}</p>
+        <p><strong>ORIGIN:</strong> {{ tree.origin }}</p>
+        <p><strong>LOCATION:</strong> {{ tree.location }}</p>
+        <p><strong>CONSERVATION STATUS:</strong> {{ tree.conservation_status.name }}</p>
+        <p><strong>SPECIES:</strong> {{ tree.species.common_name }} (<em>{{ tree.species.scientific_name }}</em>)</p>
+        <p><strong>FAMILY:</strong> {{ tree.species.family }}</p>
+        <p><strong>IUCN STATUS:</strong> {{ tree.species.iucn_status }}</p>
+        <p><strong>SPECIES DESCRIPTION:</strong> {{ tree.species.description }}</p>
+    </div>
+
+    <!-- Heritage Sites -->
+    <div class="tree-section">
+        <h3>ASSOCIATED HERITAGE SITES</h3>
+        <ul>
+            {% for site in tree.heritage_sites.all %}
+                <li>{{ site.name }}</li>
+            {% empty %}
+                <li>No heritage sites linked.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- General Uses -->
+    <div class="tree-section">
+        <h3>GENERAL USES</h3>
+        <p>{{ tree.general_use }}</p>
+    </div>
+
+    <!-- Benefits -->
+    <div class="tree-section">
+        <h3>BENEFITS</h3>
+        <p>{{ tree.pros }}</p>
+    </div>
+
+    <!-- Challenges -->
+    <div class="tree-section">
+        <h3>CHALLENGES</h3>
+        <p>{{ tree.cons }}</p>
+    </div>
+
+    <!-- Medical Benefits -->
+    <div class="tree-section">
+        <h3>MEDICAL BENEFITS</h3>
+        <p>{{ tree.medical_benefits }}</p>
+        <div class="image-gallery">
+            {% for image in medical_images %}
+                <div>
+                    <img src="{{ image.image.url }}" alt="Medical image for {{ tree.name }}">
+                    <p>{{ image.caption }}</p>
+                </div>
+            {% empty %}
+                <p>No medical benefit images.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Cultural Significance -->
+    <div class="tree-section">
+        <h3>CULTURAL SIGNIFICANCE</h3>
+        <p>{{ tree.cultural_significance }}</p>
+        <div class="image-gallery">
+            {% for image in cultural_images %}
+                <div>
+                    <img src="{{ image.image.url }}" alt="Cultural image for {{ tree.name }}">
+                    <p>{{ image.caption }}</p>
+                </div>
+            {% empty %}
+                <p>No cultural images.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Ecological Role -->
+    <div class="tree-section">
+        <h3>ECOLOGICAL ROLE</h3>
+        <p>{{ tree.ecological_role }}</p>
+    </div>
+
+    <!-- Threats and Conservation Efforts -->
+    <div class="tree-section">
+        <h3>THREATS & CONSERVATION EFFORTS</h3>
+        <p>{{ tree.threats_and_conservation_efforts }}</p>
+        <div class="image-gallery">
+            {% for image in threats_images %}
+                <div>
+                    <img src="{{ image.image.url }}" alt="Threats and conservation image for {{ tree.name }}">
+                    <p>{{ image.caption }}</p>
+                </div>
+            {% empty %}
+                <p>No threats or conservation images.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Myths -->
+    <div class="tree-section">
+        <h3>MYTHS</h3>
+        <p>{{ tree.myths }}</p>
+    </div>
+
+    <!-- Back Button -->
+    <a href="{% url 'tree_list-m' %}" class="back-button">BACK TO TREE LIST</a>
+</div>
+
+<script>
+    function downloadQRCode(format) {
+        const url = "{% url 'tree_qr_download' tree.id %}?format=" + format;
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "{{ tree.name }}_qr." + format;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function shareQRCode() {
+        if (navigator.share) {
+            navigator.share({
+                title: "QR Code for {{ tree.name }}",
+                text: "Scan this QR code to learn more about {{ tree.name }}",
+                url: "{% url 'tree_qr' tree.id %}"
+            }).then(() => console.log("Shared successfully"))
+              .catch(error => console.error("Error sharing:", error));
+        } else {
+            alert("Your browser does not support the Web Share API.");
+        }
+    }
+</script>
+
+{% endblock %}
